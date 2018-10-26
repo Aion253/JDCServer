@@ -17,6 +17,7 @@ import com.sun.net.httpserver.HttpServer;
 public class JDCServer {
 	
 	private static HttpServer server;
+	private static int port = 1200;
 	
 	/*
 	 * Accesses a series of folders placed next to the server jar file.
@@ -40,6 +41,7 @@ public class JDCServer {
 	 * Personally, as I'm using forefront to route, I have a separate website for each subdomain
 	 * but the configs will offer settings for this.
 	 */
+	@SuppressWarnings("restriction")
 	public static void main(String[] args) {
 		Logger.setup();
 		LogOut.setStreamPrefix("JDC Server");
@@ -47,7 +49,7 @@ public class JDCServer {
 		JDCServerInfo.readConfigsAtStart();
 		//System.out.println(PageParser.parseGeneratePage(w, null, null, null, w.getContentFile("/index.jdc")));
 		try {
-			server = HttpServer.create(new InetSocketAddress(80), 0);
+			server = HttpServer.create(new InetSocketAddress(port), 0);
 		} catch (IOException e) {
 			System.err.println("Failed to start HTTP Server!");
 			e.printStackTrace();
@@ -56,7 +58,7 @@ public class JDCServer {
 		server.createContext("/", new ContextHandler());
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
-		System.out.println("Server started on port " + 80);
+		System.out.println("Server started on port " + port);
 	}
 
 }

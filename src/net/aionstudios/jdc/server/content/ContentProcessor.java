@@ -42,6 +42,7 @@ public class ContentProcessor {
 	public void connectContentProcessor() {
 		if(!connected) {
 			this.jdc = ContentLoader.getJDCFromLibrary(mainClass);
+			this.jdc.initialize();
 			connected = true;
 		}
 	}

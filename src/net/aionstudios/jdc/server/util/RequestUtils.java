@@ -59,6 +59,25 @@ public class RequestUtils {
 	}
 	
 	/**
+	 * Maps elements of a get query for easy processing.
+	 * 
+	 * @param qs A get query from url.
+	 * @return A HashMap of get parameters and their values.
+	 */
+	public static Map<String, String> resolveCookies(HttpExchange he) {
+		if(he.getRequestHeaders().containsKey("Cookie")) {
+			String qs = he.getRequestHeaders().getFirst("Cookie");
+			Map<String, String> cookies = new HashMap<String, String>();
+			for(String s : qs.split("; ")) {
+				String[] nv = s.split("=", 2);
+				cookies.put(nv[0], nv[1]);
+			}
+			return cookies;
+		}
+		return null;
+	}
+	
+	/**
 	 * Maps elements of a post query for easy processing.
 	 * 
 	 * @param he The HTTP request.
