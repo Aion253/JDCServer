@@ -20,6 +20,7 @@ import net.aionstudios.jdc.processor.Processor;
 import net.aionstudios.jdc.processor.ProcessorSet;
 import net.aionstudios.jdc.server.JDCServerInfo;
 import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
+import net.aionstudios.jdc.server.util.FormatUtils;
 
 public class Website {
 	
@@ -37,8 +38,8 @@ public class Website {
 	private File processorConfig;
 	private File errorsConfig;
 	
-	private JSONObject processorJson = new JSONObject();
-	private JSONObject errorJson = new JSONObject();
+	private JSONObject processorJson = FormatUtils.getLinkedJsonObject();
+	private JSONObject errorJson = FormatUtils.getLinkedJsonObject();
 	
 	public Website(String name, String[] addresses, boolean sslOn) {
 		this.name = name;
@@ -70,7 +71,7 @@ public class Website {
 			try {
 				processorConfig.createNewFile();
 				JSONArray pa = new JSONArray();
-				JSONObject pad = new JSONObject();
+				JSONObject pad = FormatUtils.getLinkedJsonObject();
 				pad.put("name", "default");
 				pad.put("jar", "default.jar");
 				pad.put("jdc_class", "com.default.MainJDC");
@@ -110,7 +111,7 @@ public class Website {
 			try {
 				errorsConfig.createNewFile();
 				JSONArray ea = new JSONArray();
-				JSONObject ead = new JSONObject();
+				JSONObject ead = FormatUtils.getLinkedJsonObject();
 				ead.put("error_code", 404);
 				ead.put("enable_override", false);
 				ead.put("error_file", "null");
