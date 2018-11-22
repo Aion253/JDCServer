@@ -14,6 +14,7 @@ public class ContentLoader {
 	
 	private static URLClassLoader ucl;
 	private static List<URL> urls = new ArrayList<URL>();
+	//Should add support for settings based import of dependencies not included in the library or server so that they don't have to be re-packaged in order for the project to run.
 	
 	public static void initializeClassLoader() {
 		//Should read a file for urls and other information first, then load classes.

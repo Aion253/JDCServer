@@ -31,9 +31,10 @@ public class ResponseUtils {
 		if(rc.getCode()!=200) {
 			try {
 				String errorResp = w.getErrorContent(rc, he, vars);
-				he.sendResponseHeaders(rc.getCode(), errorResp.length());
+				byte[] errRBytes = errorResp.getBytes();
+				he.sendResponseHeaders(rc.getCode(), errRBytes.length);
 				OutputStream os = he.getResponseBody();
-				os.write(errorResp.getBytes());
+				os.write(errRBytes);
 				os.close();
 				return true;
 			} catch (IOException e) {
@@ -46,9 +47,10 @@ public class ResponseUtils {
 				for(Cookie c : vars.getCookieManager().getNewCookies()) {
 					respHeaders.add("Set-Cookie", c.makeSetterString());
 				}
-				he.sendResponseHeaders(200, response.length());
+				byte[] respBytes = response.getBytes();
+				he.sendResponseHeaders(200, respBytes.length);
 				OutputStream os = he.getResponseBody();
-				os.write(response.getBytes());
+				os.write(respBytes);
 				os.close();
 				return true;
 			} else {
