@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import com.sun.net.httpserver.Headers;
@@ -30,8 +31,11 @@ public class ResponseUtils {
 		ResponseCode rc = gResponse.getResponseCode();
 		if(rc.getCode()!=200) {
 			try {
+				Headers respHeaders = he.getResponseHeaders();
+				String encoding = "UTF-8";
+				respHeaders.set("Content-Type", "text/html; charset="+encoding);
 				String errorResp = w.getErrorContent(rc, he, vars);
-				byte[] errRBytes = errorResp.getBytes();
+				byte[] errRBytes = errorResp.getBytes(StandardCharsets.UTF_8);
 				he.sendResponseHeaders(rc.getCode(), errRBytes.length);
 				OutputStream os = he.getResponseBody();
 				os.write(errRBytes);
@@ -47,7 +51,9 @@ public class ResponseUtils {
 				for(Cookie c : vars.getCookieManager().getNewCookies()) {
 					respHeaders.add("Set-Cookie", c.makeSetterString());
 				}
-				byte[] respBytes = response.getBytes();
+				String encoding = "UTF-8";
+				respHeaders.set("Content-Type", "text/html; charset="+encoding);
+				byte[] respBytes = response.getBytes(StandardCharsets.UTF_8);
 				he.sendResponseHeaders(200, respBytes.length);
 				OutputStream os = he.getResponseBody();
 				os.write(respBytes);
