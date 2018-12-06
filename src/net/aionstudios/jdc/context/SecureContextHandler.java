@@ -55,7 +55,7 @@ public class SecureContextHandler implements HttpHandler {
 		if(!wb.isSslOn()) {
 			return;
 		}
-		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies);
+		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);
 		if(requestSplit[0].endsWith(".jdc")) {
 			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb);
 			return;
