@@ -6,13 +6,16 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import net.aionstudios.jdc.content.OutgoingRequest;
 import net.aionstudios.jdc.content.RequestVariables;
 import net.aionstudios.jdc.content.ResponseCode;
+import net.aionstudios.jdc.server.content.GeneratorResponse;
 import net.aionstudios.jdc.server.content.PageParser;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 import net.aionstudios.jdc.server.util.RequestUtils;
 import net.aionstudios.jdc.server.util.ResponseUtils;
+import net.aionstudios.jdc.service.OutgoingRequestService;
 
 public class SecureContextHandler implements HttpHandler {
 
@@ -32,8 +35,9 @@ public class SecureContextHandler implements HttpHandler {
 		if(he.getRequestURI().toString().contains("?")) {
 			requestSplit = he.getRequestURI().toString().split("\\?", 2);
 		} else {
-			requestSplit = new String[1];
+			requestSplit = new String[2];
 			requestSplit[0] = he.getRequestURI().toString();
+			requestSplit[1] = "";
 		}
 		String requestContext = "";
 		if(requestSplit[0].endsWith("/")) {
@@ -54,6 +58,21 @@ public class SecureContextHandler implements HttpHandler {
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
 		if(!wb.isSslOn()) {
 			return;
+		}
+		String proxyUrl = wb.getProxyManager().getProxyUrl(requestSplit[0]);
+		System.out.println("pr: "+requestSplit[0]);
+		if(proxyUrl!=null) {
+			System.out.println(proxyUrl);
+			OutgoingRequest or = new OutgoingRequest("", null);
+			String rp = OutgoingRequestService.executePost(proxyUrl+ (requestSplit[1].length()>0 ? "?" : "") + requestSplit[1], OutgoingRequestService.postMapToString(postQuery), or);
+			RequestVariables v = new RequestVariables(null, null, null, null);
+			or.getLastHeader("Content-Type");
+			v.setContentType(or.getLastHeader("Content-Type"));
+			v.setRedirect(or.getLastHeader("Location"));
+			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), ResponseCode.OK), he, v, null, wb);
+			return;
+		} else {
+			System.out.println("non");
 		}
 		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);
 		if(requestSplit[0].endsWith(".jdc")) {

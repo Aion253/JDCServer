@@ -19,6 +19,7 @@ import net.aionstudios.jdc.processor.ElementProcessor;
 import net.aionstudios.jdc.processor.Processor;
 import net.aionstudios.jdc.processor.ProcessorSet;
 import net.aionstudios.jdc.server.JDCServerInfo;
+import net.aionstudios.jdc.server.proxy.ProxyManager;
 import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
 import net.aionstudios.jdc.server.util.FormatUtils;
 
@@ -29,6 +30,7 @@ public class Website {
 	private boolean sslOn;
 	private List<ContentProcessor> processors = new ArrayList<ContentProcessor>();
 	private Map<ResponseCode, File> errorMappings = new HashMap<ResponseCode, File>();
+	private ProxyManager pm = new ProxyManager();
 	
 	private File websiteFolder;
 	
@@ -37,9 +39,11 @@ public class Website {
 	
 	private File processorConfig;
 	private File errorsConfig;
+	private File proxiesConfig;
 	
 	private JSONObject processorJson = FormatUtils.getLinkedJsonObject();
 	private JSONObject errorJson = FormatUtils.getLinkedJsonObject();
+	private JSONObject proxyJson = FormatUtils.getLinkedJsonObject();
 	
 	public Website(String name, String[] addresses, boolean sslOn) {
 		this.name = name;
@@ -50,6 +54,7 @@ public class Website {
 		javaFolder = new File("./websites/"+name+"/java");
 		processorConfig = new File("./websites/"+name+"/processors.json");
 		errorsConfig = new File("./websites/"+name+"/errors.json");
+		proxiesConfig = new File("./websites/"+name+"/proxies.json");
 		if(!websiteFolder.exists()) {
 			websiteFolder.mkdirs();
 		}
@@ -61,6 +66,7 @@ public class Website {
 		}
 		readProcessorsConfig();
 		readErrorsConfig();
+		readProxiesConfig();
 		WebsiteManager.addWebsite(this);
 	}
 	
@@ -130,7 +136,7 @@ public class Website {
 		try {
 			errorArray = errorJson.getJSONArray("errors");
 		} catch (JSONException e1) {
-			System.err.println("Failed to interpret processor config!");
+			System.err.println("Failed to interpret errors config!");
 			e1.printStackTrace();
 		}
 		for(int i = 0; i < errorArray.length(); i++) {
@@ -158,6 +164,45 @@ public class Website {
 				}
 			} catch (JSONException e) {
 				System.err.println("Failed to interpret processor config!");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void readProxiesConfig() {
+		if(proxiesConfig.exists()) {
+			proxyJson = JDCServerInfo.readConfig(proxiesConfig);
+		} else {
+			try {
+				proxiesConfig.createNewFile();
+				JSONArray ea = new JSONArray();
+				JSONObject ead = FormatUtils.getLinkedJsonObject();
+				ead.put("context", "/");
+				ead.put("proxy_url", "/");
+				ea.put(ead);
+				proxyJson.put("proxies", ea);
+				JDCServerInfo.writeConfig(proxyJson, proxiesConfig);
+			} catch (IOException e) {
+				System.err.println("Encountered an IOException during config file operations!");
+				e.printStackTrace();
+			} catch (JSONException e) {
+				System.err.println("Encountered an IOException during config file operations!");
+				e.printStackTrace();
+			}
+		}
+		JSONArray proxyArray = new JSONArray();
+		try {
+			proxyArray = proxyJson.getJSONArray("proxies");
+		} catch (JSONException e1) {
+			System.err.println("Failed to interpret proxies config!");
+			e1.printStackTrace();
+		}
+		for(int i = 0; i < proxyArray.length(); i++) {
+			try {
+				JSONObject prx = proxyArray.getJSONObject(i);
+				pm.putProxy(prx.getString("context"), prx.getString("proxy_url"));
+			} catch (JSONException e) {
+				System.err.println("Failed to interpret proxies config!");
 				e.printStackTrace();
 			}
 		}
@@ -263,6 +308,10 @@ public class Website {
 	
 	public List<ContentProcessor> getProcessors(){
 		return processors;
+	}
+
+	public ProxyManager getProxyManager() {
+		return pm;
 	}
 
 }

@@ -29,11 +29,20 @@ public class ResponseUtils {
 	public static boolean generateHTTPResponse(GeneratorResponse gResponse, HttpExchange he, RequestVariables vars, File page, Website w) {
 		String response = gResponse.getResponse();
 		ResponseCode rc = gResponse.getResponseCode();
-		if(rc.getCode()!=200) {
+		String redirect = vars!=null ? vars.getRedirect() : null;
+		if(!(rc.getCode() >= 100)) {
+			System.out.println(rc.getCodeName());
+			System.out.println("A");
+			rc = ResponseCode.OK;
+		} else {
+			System.out.println(rc.getCodeName());
+			System.out.println("B");
+		}
+		System.out.println(rc.getCode() + " " + response);
+		if(rc.getCode()>=400) {
 			try {
 				Headers respHeaders = he.getResponseHeaders();
-				String encoding = "UTF-8";
-				respHeaders.set("Content-Type", "text/html; charset="+encoding);
+				respHeaders.set("Content-Type", vars.getContentType());
 				String errorResp = w.getErrorContent(rc, he, vars);
 				byte[] errRBytes = errorResp.getBytes(StandardCharsets.UTF_8);
 				he.sendResponseHeaders(rc.getCode(), errRBytes.length);
@@ -47,14 +56,21 @@ public class ResponseUtils {
 		}
 		try {
 			if(response!=null&&!response.isEmpty()) {
+				System.out.println("s");
 				Headers respHeaders = he.getResponseHeaders();
-				for(Cookie c : vars.getCookieManager().getNewCookies()) {
-					respHeaders.add("Set-Cookie", c.makeSetterString());
+				if(vars!=null) {
+					for(Cookie c : vars.getCookieManager().getNewCookies()) {
+						respHeaders.add("Set-Cookie", c.makeSetterString());
+					}
 				}
-				String encoding = "UTF-8";
-				respHeaders.set("Content-Type", "text/html; charset="+encoding);
+//				if(redirect!=null) {
+//					rc = ResponseCode.REDIRECT;
+//					respHeaders.set("Location", vars.getRedirect());
+//				}
+				respHeaders.set("Content-Type", vars.getContentType());
 				byte[] respBytes = response.getBytes(StandardCharsets.UTF_8);
-				he.sendResponseHeaders(200, respBytes.length);
+				System.out.println("C: "+new String(respBytes, "UTF-8"));
+				he.sendResponseHeaders(rc.getCode(), respBytes.length);
 				OutputStream os = he.getResponseBody();
 				os.write(respBytes);
 				os.close();
