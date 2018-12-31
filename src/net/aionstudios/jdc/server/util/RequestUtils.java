@@ -46,9 +46,9 @@ public class RequestUtils {
 	            int eqPos = qs.indexOf('=', last);
 	            try {
 	                if (eqPos < 0 || eqPos > next)
-	                    result.put(URLDecoder.decode(qs.substring(last, next), "utf-8"), "");
+	                    result.put(URLDecoder.decode(qs.substring(last, next), "UTF-8"), "");
 	                else
-	                    result.put(URLDecoder.decode(qs.substring(last, eqPos), "utf-8"), URLDecoder.decode(qs.substring(eqPos + 1, next), "utf-8"));
+	                    result.put(URLDecoder.decode(qs.substring(last, eqPos), "UTF-8"), URLDecoder.decode(qs.substring(eqPos + 1, next), "UTF-8"));
 	            } catch (UnsupportedEncodingException e) {
 	                throw new RuntimeException(e); // will never happen, utf-8 support is mandatory for java
 	            }
@@ -103,7 +103,11 @@ public class RequestUtils {
 		    if (keyValue.length != 2) {
 		      continue;
 		    }
-		    parameters.put(keyValue[0], keyValue[1]);
+		    try {
+				parameters.put(keyValue[0], URLDecoder.decode(keyValue[1], "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		  }
 		  return parameters;
 	}

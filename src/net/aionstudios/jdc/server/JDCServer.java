@@ -24,7 +24,7 @@ import com.sun.net.httpserver.HttpServer;
 public class JDCServer {
 	
 	private static HttpServer server;
-	private static int port = 1200;
+	private static int port = 80;
 	
 	/*
 	 * Accesses a series of folders placed next to the server jar file.

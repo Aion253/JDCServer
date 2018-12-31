@@ -19,7 +19,7 @@ import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
 public class PageParser {
 	
 	public static GeneratorResponse parseGeneratePage(Website w, HttpExchange he, RequestVariables vars, File page) {
-		ResponseCode rc = ResponseCode.OK;
+		vars.setResponseCode(ResponseCode.OK);
 		if(!page.exists()) {
 			return new GeneratorResponse("", ResponseCode.NOT_FOUND);
 		}
@@ -30,21 +30,21 @@ public class PageParser {
 		}
 		Document doc = doc = Jsoup.parse(fileContent);
 		for(Element e : doc.getElementsByTag("jdc")) {
-			if(rc.getCode()!=200) {
-				return new GeneratorResponse("", rc);
+			if(vars.getResponseCode().getCode()!=200) {
+				return new GeneratorResponse("", vars.getResponseCode());
 			}
 			if(e.hasAttr("javaexecute")) {
 				try {
-					w.locateProcessor(rc, e.attr("javaexecute")).startCompute(he, vars, pageVariables);
+					w.locateProcessor(vars.getResponseCode(), e.attr("javaexecute")).startCompute(he, vars, pageVariables);
 				} catch (Exception e1) {
 					ConsoleErrorUtils.printServerError(ResponseCode.INTERNAL_SERVER_ERROR, e.attr("javaexecute"), e1);
 					return new GeneratorResponse("", ResponseCode.INTERNAL_SERVER_ERROR);
 				}
 			}
 			if(e.hasAttr("javagenerate")) {
-				JDCHeadElement head = new JDCHeadElement();
+				JDCHeadElement head = new JDCHeadElement(e.html());
 				try {
-					e.before(w.locateElementProcessor(rc, e.attr("javagenerate")).getContent(head, he, vars, pageVariables));
+					e.before(w.locateElementProcessor(vars.getResponseCode(), e.attr("javagenerate")).getContent(head, he, vars, pageVariables));
 				} catch (Exception e1) {
 					ConsoleErrorUtils.printServerError(ResponseCode.INTERNAL_SERVER_ERROR, e.attr("javagenerate"), e1);
 					return new GeneratorResponse("", ResponseCode.INTERNAL_SERVER_ERROR);
@@ -56,12 +56,12 @@ public class PageParser {
 			e.remove();
 		}
 		for(Element e : doc.getElementsByAttribute("javagenerate")) {
-			if(rc.getCode()!=200) {
-				return null;
+			if(vars.getResponseCode().getCode()!=200) {
+				return new GeneratorResponse("", vars.getResponseCode());
 			}
-			JDCHeadElement head = new JDCHeadElement();
+			JDCHeadElement head = new JDCHeadElement(e.html());
 			try {
-				e.html(w.locateElementProcessor(rc, e.attr("javagenerate")).getContent(head, he, vars, pageVariables));
+				e.html(w.locateElementProcessor(vars.getResponseCode(), e.attr("javagenerate")).getContent(head, he, vars, pageVariables));
 			} catch (Exception e1) {
 				ConsoleErrorUtils.printServerError(ResponseCode.INTERNAL_SERVER_ERROR, e.attr("javagenerate"), e1);
 				return new GeneratorResponse("", ResponseCode.INTERNAL_SERVER_ERROR);
@@ -71,7 +71,7 @@ public class PageParser {
 			}
 			e.removeAttr("javagenerate");
 		}
-		return new GeneratorResponse(doc.outerHtml(), rc);
+		return new GeneratorResponse(doc.outerHtml(), vars.getResponseCode());
 	}
 
 }

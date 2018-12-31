@@ -29,7 +29,7 @@ public class JDCSecureServer {
 	
 	private static boolean started = false;
 	private static HttpsServer server;
-	private static int port = 1201;
+	private static int port = 443;
 	
 	/*
 	 * To generate a compatible JKS certificate it is recommended to get the default cert/key files from a certificate authority

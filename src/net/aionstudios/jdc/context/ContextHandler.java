@@ -58,14 +58,13 @@ public class ContextHandler implements HttpHandler {
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
 		String proxyUrl = wb.getProxyManager().getProxyUrl(requestSplit[0]);
 		if(proxyUrl!=null) {
-			System.out.println(proxyUrl);
 			OutgoingRequest or = new OutgoingRequest("", null);
 			String rp = OutgoingRequestService.executePost(proxyUrl+ (requestSplit[1].length()>0 ? "?" : "") + requestSplit[1], OutgoingRequestService.postMapToString(postQuery), or);
 			RequestVariables v = new RequestVariables(null, null, null, null);
 			or.getLastHeader("Content-Type");
 			v.setContentType(or.getLastHeader("Content-Type"));
 			v.setRedirect(or.getLastHeader("Location"));
-			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), ResponseCode.OK), he, v, null, wb);
+			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb);
 			return;
 		}
 		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);

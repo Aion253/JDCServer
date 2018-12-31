@@ -31,14 +31,8 @@ public class ResponseUtils {
 		ResponseCode rc = gResponse.getResponseCode();
 		String redirect = vars!=null ? vars.getRedirect() : null;
 		if(!(rc.getCode() >= 100)) {
-			System.out.println(rc.getCodeName());
-			System.out.println("A");
 			rc = ResponseCode.OK;
-		} else {
-			System.out.println(rc.getCodeName());
-			System.out.println("B");
 		}
-		System.out.println(rc.getCode() + " " + response);
 		if(rc.getCode()>=400) {
 			try {
 				Headers respHeaders = he.getResponseHeaders();
@@ -56,20 +50,18 @@ public class ResponseUtils {
 		}
 		try {
 			if(response!=null&&!response.isEmpty()) {
-				System.out.println("s");
 				Headers respHeaders = he.getResponseHeaders();
 				if(vars!=null) {
 					for(Cookie c : vars.getCookieManager().getNewCookies()) {
 						respHeaders.add("Set-Cookie", c.makeSetterString());
 					}
 				}
-//				if(redirect!=null) {
-//					rc = ResponseCode.REDIRECT;
-//					respHeaders.set("Location", vars.getRedirect());
-//				}
+				if(redirect!=null) {
+					rc = ResponseCode.REDIRECT;
+					respHeaders.set("Location", vars.getRedirect());
+				}
 				respHeaders.set("Content-Type", vars.getContentType());
 				byte[] respBytes = response.getBytes(StandardCharsets.UTF_8);
-				System.out.println("C: "+new String(respBytes, "UTF-8"));
 				he.sendResponseHeaders(rc.getCode(), respBytes.length);
 				OutputStream os = he.getResponseBody();
 				os.write(respBytes);
