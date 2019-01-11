@@ -57,7 +57,7 @@ public class ResponseUtils {
 					}
 				}
 				if(redirect!=null) {
-					rc = ResponseCode.REDIRECT;
+					rc = ResponseCode.FOUND_REDIRECT;
 					respHeaders.set("Location", vars.getRedirect());
 				}
 				respHeaders.set("Content-Type", vars.getContentType());
