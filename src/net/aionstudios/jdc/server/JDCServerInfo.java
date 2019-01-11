@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.aionstudios.jdc.database.DatabaseConnector;
 import net.aionstudios.jdc.server.content.ContentLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
@@ -20,8 +21,10 @@ public class JDCServerInfo {
 
 	public static String JDCS_VER = "1.0.0";
 	public static String JDCS_CONFIG = "./sites.json";
+	public static String CONFIG_DB = "./database.json";
 	
 	private static JSONObject webconfig;
+	private static JSONObject dbConfig;
 	
 	/**
 	 * Reads configurable information when the server starts and handles setup if necessary.
@@ -31,6 +34,7 @@ public class JDCServerInfo {
 	 */
 	public static boolean readConfigsAtStart() {
 		webconfig = FormatUtils.getLinkedJsonObject();
+		dbConfig = FormatUtils.getLinkedJsonObject();
 		try {
 			File dbcf = new File(JDCS_CONFIG);
 			if(!dbcf.exists()) {
@@ -49,6 +53,32 @@ public class JDCServerInfo {
 				writeConfig(webconfig, dbcf);
 			} else {
 				webconfig = readConfig(dbcf);
+			}
+			File dcf = new File(CONFIG_DB);
+			if(!dcf.exists()) {
+				dcf.getParentFile().mkdirs();
+				dcf.createNewFile();
+				dbConfig.put("hostname", "127.0.0.1");
+				dbConfig.put("database", "db");
+				dbConfig.put("username", "root");
+				dbConfig.put("password", "password");
+				dbConfig.put("port", 0);
+				dbConfig.put("enabled", false);
+				writeConfig(dbConfig, dcf);
+			} else {
+				dbConfig = readConfig(dcf);
+			}
+			if(dbConfig.getBoolean("enabled")) {
+				String hostname = dbConfig.getString("hostname");
+				String database = dbConfig.getString("database");
+				String username = dbConfig.getString("username");
+				String password = dbConfig.getString("password");
+				int port = dbConfig.getInt("port");
+				if(port > 0 && port < 65536) {
+					DatabaseConnector.setupDatabase(hostname, database, Integer.toString(port), username, password);
+				} else {
+					DatabaseConnector.setupDatabase(hostname, database, username, password);
+				}
 			}
 			JSONArray sa = webconfig.getJSONArray("websites");
 			for(int i = 0; i < sa.length(); i++) {
