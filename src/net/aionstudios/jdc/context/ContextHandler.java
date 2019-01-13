@@ -17,6 +17,11 @@ import net.aionstudios.jdc.server.util.RequestUtils;
 import net.aionstudios.jdc.server.util.ResponseUtils;
 import net.aionstudios.jdc.service.OutgoingRequestService;
 
+/**
+ * Handles standard HTTP Contexts.
+ * @author Winter
+ *
+ */
 public class ContextHandler implements HttpHandler {
 
 	@Override

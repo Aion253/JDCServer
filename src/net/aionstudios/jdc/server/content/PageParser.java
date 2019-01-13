@@ -16,8 +16,21 @@ import net.aionstudios.jdc.content.ResponseCode;
 import net.aionstudios.jdc.server.JDCServerInfo;
 import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
 
+/**
+ * Locates pages, reads them, and completes processing and modification via {@link Processor}s and {@link ElementProcessor}s when they are found.
+ * @author Winter
+ *
+ */
 public class PageParser {
 	
+	/**
+	 * Parses a page, passing each next tag to its respective {@link Processor} of {@link ElementProcessor}.
+	 * @param w		The {@link Website} on which the request was made.
+	 * @param he	The {@link HttpExchange} through which the request will be completed.
+	 * @param vars	The {@link RequestVariables} incorporating request and response variables to create dynamic responses.
+	 * @param page	The file name of the requested page.
+	 * @return A {@link GeneratorReponse} having completed processing.
+	 */
 	public static GeneratorResponse parseGeneratePage(Website w, HttpExchange he, RequestVariables vars, File page) {
 		vars.setResponseCode(ResponseCode.OK);
 		if(!page.exists()) {

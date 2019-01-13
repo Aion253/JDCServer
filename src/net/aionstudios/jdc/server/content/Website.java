@@ -23,6 +23,11 @@ import net.aionstudios.jdc.server.proxy.ProxyManager;
 import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
 import net.aionstudios.jdc.server.util.FormatUtils;
 
+/**
+ * A website retrieves content from a specific folder when requests are made to the server on addresses for which this website accepts.
+ * @author Winter
+ *
+ */
 public class Website {
 	
 	private String name;
@@ -45,6 +50,12 @@ public class Website {
 	private JSONObject errorJson = FormatUtils.getLinkedJsonObject();
 	private JSONObject proxyJson = FormatUtils.getLinkedJsonObject();
 	
+	/**
+	 * Creates a new website reading its configurations and loading its backend code.
+	 * @param name		The system name of this website.
+	 * @param addresses	The addresses for which a connection to the server should resolve with content on this website.
+	 * @param sslOn		Whether of not the website should be made accessible through the {@link JDCSecureServer}.
+	 */
 	public Website(String name, String[] addresses, boolean sslOn) {
 		this.name = name;
 		this.addresses = addresses;
@@ -70,6 +81,10 @@ public class Website {
 		WebsiteManager.addWebsite(this);
 	}
 	
+	/**
+	 * Reads the Java {@link JDC} processor configuration file for this website and registers a {@link ContentProcessor} to load external archives into the JVM.
+	 * @see {@link ContentLoader}
+	 */
 	public void readProcessorsConfig() {
 		if(processorConfig.exists()) {
 			processorJson = JDCServerInfo.readConfig(processorConfig);
@@ -110,6 +125,11 @@ public class Website {
 		}
 	}
 	
+	/**
+	 * Reads the error configuration file for this website and registers them to their relevant error codes.
+	 * @see {@link ResponseCode}
+	 * @see {@link #makeErrorMapping(ResponseCode, File)}
+	 */
 	public void readErrorsConfig() {
 		if(errorsConfig.exists()) {
 			errorJson = JDCServerInfo.readConfig(errorsConfig);
@@ -169,6 +189,10 @@ public class Website {
 		}
 	}
 	
+	/**
+	 * Reads the proxy configuration file for this website and registers them to internally redirect requests.
+	 * @see {@link ProxyManager}
+	 */
 	public void readProxiesConfig() {
 		if(proxiesConfig.exists()) {
 			proxyJson = JDCServerInfo.readConfig(proxiesConfig);
@@ -208,18 +232,34 @@ public class Website {
 		}
 	}
 	
+	/**
+	 * @return A string, the name of this website, as read from its configuration.
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/**
+	 * @return A string array, each of the host addresses which this website can be reached on.
+	 */
 	public String[] getAddresses() {
 		return addresses;
 	}
 	
+	/**
+	 * @return True if this website is configured to allow access through the {@link JDCSecureServer}.
+	 */
 	public boolean isSslOn() {
 		return sslOn;
 	}
 	
+	/**
+	 * Adds a new {@link ContentProcessor} to this website.
+	 * <p>
+	 * An unlimited number of additional archives containing {@link JDC} main classes can be added to a website.
+	 * @param processor		The {@link ContentProcessor} to be added.
+	 * @see {@link ContentLoader}
+	 */
 	public void addContentProcessor(ContentProcessor processor) {
 		for(ContentProcessor cp : processors) {
 			if(cp.getName().equals(processor.getName())) {
@@ -231,6 +271,12 @@ public class Website {
 		processors.add(processor);
 	}
 	
+	/**
+	 * Locates a processor named by the value of a "javagenerate" attribute in an HTML tag.
+	 * @param rc		The {@link ResponseCode} to write an internal server error to if the {@link ElementProcessor} doesn't exist.
+	 * @param path		The '.' delimited string naming an {@link ElementProcessor} like [jdc_name].[processor_set].[element_processor] .
+	 * @return An {@link ElementProcessor} to process on the tag and generate HTML.
+	 */
 	public ElementProcessor locateElementProcessor(ResponseCode rc, String path) {
 		String[] points = path.split("\\.", 3);
 		if(points.length!=3) {
@@ -256,6 +302,12 @@ public class Website {
 		return null;
 	}
 	
+	/**
+	 * Locates a processor named by the value of a "javaexecute" attribute in an HTML tag.
+	 * @param rc		The {@link ResponseCode} to write an internal server error to if the {@link Processor} doesn't exist.
+	 * @param path		The '.' delimited string naming a {@link Processor} like [jdc_name].[processor_set].[processor] .
+	 * @return A {@link Processor} to process without dynamically generating content.
+	 */
 	public Processor locateProcessor(ResponseCode rc, String path) {
 		String[] points = path.split("\\.", 3);
 		if(points.length!=3) {
@@ -281,6 +333,15 @@ public class Website {
 		return null;
 	}
 	
+	/**
+	 * Searches for an error page on this website by {@link ResponseCode} and returns a {@link GeneratorResponse}.
+	 * <p>
+	 * If the website has not set a custom error page for the {@link ResponseCode} the default error page is returned.
+	 * @param code		The {@link ResponseCode} for which this error should be generated.
+	 * @param he		The {@link HttpExchange} handling this request.
+	 * @param vars		The {@link RequestVariables} containing request and response data.
+	 * @return A string, the content of this error page.
+	 */
 	public String getErrorContent(ResponseCode code, HttpExchange he, RequestVariables vars) {
 		if(errorMappings.containsKey(code)) {
 			String er = PageParser.parseGeneratePage(this, he, vars, errorMappings.get(code)).getResponse();
@@ -294,22 +355,43 @@ public class Website {
 		}
 	}
 	
+	/**
+	 * Creates a new error mapping, pointing to a file by its website-relative path string.
+	 * @param code			The {@link ResponseCode} for which this mapping should be made.
+	 * @param relativePath	The website-relative path string of the error file.
+	 */
 	public void makeErrorMapping(ResponseCode code, String relativePath) {
 		errorMappings.put(code, getContentFile(relativePath));
 	}
 	
+	/**
+	 * Creates a new error mapping, pointing to a file.
+	 * @param code			The {@link ResponseCode} for which this mapping should be made.
+	 * @param relativePath	The error file.
+	 */
 	public void makeErrorMapping(ResponseCode code, File relativePath) {
 		errorMappings.put(code, relativePath);
 	}
 	
+	/***
+	 * Returns a file via the website-relative path string.
+	 * @param path		The website-realtive path string.
+	 * @return		The file named by this website-relative path string.
+	 */
 	public File getContentFile(String path) {
 		return new File(contentFolder, path);
 	}
 	
+	/**
+	 * @return A list of all {@link ContentProcessor}s registered to this website.
+	 */
 	public List<ContentProcessor> getProcessors(){
 		return processors;
 	}
 
+	/**
+	 * @return This website's {@link ProxyManager}.
+	 */
 	public ProxyManager getProxyManager() {
 		return pm;
 	}

@@ -10,6 +10,11 @@ import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
+/**
+ * A utility class to standardize and ease access to header variables.
+ * @author Winter
+ *
+ */
 public class RequestUtils {
 	
 	/**

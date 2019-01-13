@@ -3,10 +3,19 @@ package net.aionstudios.jdc.server.content;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages all {@link Website}s exposed by the server.
+ * @author Winter
+ *
+ */
 public class WebsiteManager {
 	
 	public static List<Website> websites = new ArrayList<Website>();
 	
+	/**
+	 * Adds a {@link Website} to the list available from the server.
+	 * @param ws	The {@link Website} to be added.
+	 */
 	public static void addWebsite(Website ws) {
 		for(Website w : websites) {
 			if(w.getName() == ws.getName()) {
@@ -18,6 +27,11 @@ public class WebsiteManager {
 		websites.add(ws);
 	}
 	
+	/**
+	 * Gets a {@link Website} by its name.
+	 * @param name	The name of the {@link Website} to be returned.
+	 * @return The named {@link Website}, or null if one isn't found.
+	 */
 	public static Website getWebsite(String name) {
 		for(Website w : websites) {
 			if(w.getName().equals(name)) {
@@ -27,6 +41,11 @@ public class WebsiteManager {
 		return null;
 	}
 	
+	/**
+	 * Gets a {@link Website} by address.
+	 * @param addr	The addresses for which a {@link Website} should be found.
+	 * @return The {@link Website} accpeting the address, or null if one isn't found.
+	 */
 	public static Website getWebsiteByAddress(String addr) {
 		for(Website w : websites) {
 			for(String a : w.getAddresses()) {
@@ -38,6 +57,10 @@ public class WebsiteManager {
 		return null;
 	}
 	
+	/**
+	 * Connects each of the {@link ContentProcessor}s from every {@link Website}.
+	 * @see {@link ContentLoader}
+	 */
 	public static void connectContentProcessors() {
 		for(Website w : websites) {
 			for(ContentProcessor cp : w.getProcessors()) {

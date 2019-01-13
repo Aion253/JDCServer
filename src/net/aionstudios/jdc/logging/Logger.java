@@ -8,6 +8,11 @@ import java.net.URISyntaxException;
 
 import org.fusesource.jansi.AnsiConsole;
 
+/**
+ * Manages the application's log file.
+ * @author Winter
+ *
+ */
 public class Logger {
 	
 	private static File outFile;
@@ -16,6 +21,9 @@ public class Logger {
 	private static int logCountToday = 1;
 	private static boolean setup = false;
 	
+	/**
+	 * Installs the ANSI Console, creates the correct log file, and opens a file output stream to it.
+	 */
 	public static void setup(){
 		if(!setup){
 			AnsiConsole.systemInstall();
@@ -33,6 +41,9 @@ public class Logger {
 		}
 	}
 
+	/**
+	 * Renames the log file to avoid overwriting existing logs.
+	 */
 	private static void correctFileNaming() {
 		if(hasFile()){
 			logCountToday++;
@@ -41,10 +52,18 @@ public class Logger {
 		}
 	}
 
+	/**
+	 * Gets this logger's .
+	 * @return The print stream that prints to the log file.
+	 */
 	public static PrintStream getStream() {
 		return stream;
 	}
 	
+	/**
+	 * Checks whether or not the log file exists. Used internally to ensure that a log file won't be overwritten.
+	 * @return True if the log file exists, false otherwise.
+	 */
 	public static boolean hasFile(){
 		if(outFile.exists()){
 			return true;

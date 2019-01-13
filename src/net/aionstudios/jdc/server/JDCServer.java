@@ -48,7 +48,10 @@ public class JDCServer {
 	 * Personally, as I'm using forefront to route, I have a separate website for each subdomain
 	 * but the configs will offer settings for this.
 	 */
-	@SuppressWarnings("restriction")
+	/**
+	 * Starts a new {@link HttpServer} as well as the server's {@link Logger} and loads config files.
+	 * @param args		Arguments passed by the command line.
+	 */
 	public static void main(String[] args) {
 		Logger.setup();
 		LogOut.setStreamPrefix("JDC Server");
@@ -69,6 +72,9 @@ public class JDCServer {
 		startSecureServer();
 	}
 	
+	/**
+	 * Initializes a {@link JDCSecureServer} if config files dictate to do so. HTTPS is disabled by default.
+	 */
 	private static void startSecureServer() {
 		File certsConfig = new File("./certs.json");
 		JSONObject certsJson = FormatUtils.getLinkedJsonObject();

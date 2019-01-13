@@ -25,6 +25,11 @@ import com.sun.net.httpserver.HttpsParameters;
 
 import net.aionstudios.jdc.context.SecureContextHandler;
 
+/**
+ * An HTTPS enabled instance of the {@link JDCServer}, to handle secured requests.
+ * @author Winter
+ *
+ */
 public class JDCSecureServer {
 	
 	private static boolean started = false;
@@ -42,6 +47,13 @@ public class JDCSecureServer {
 	 * 
 	 */
 	
+	/**
+	 * Starts a new {@link HttpsServer} after adding a valid direct or chain JKS certificate file to the key and trust SunX509 managers.
+	 * @param certificate		A string representing the path to the certificate file below the relative path ./certs/
+	 * @param storePassword		The JKS {@link KeyStore}'s password.
+	 * @param keyPassword		The password for a single {@link Certificate} in the JKS {@link KeyStore}.
+	 * @param certificateAlias	The JKS {@link KeyStore}'s named certificate.
+	 */
 	public static void startServer(String certificate, String storePassword, String keyPassword, String certificateAlias) {
 		if(!started) {
 			boolean noError = false;

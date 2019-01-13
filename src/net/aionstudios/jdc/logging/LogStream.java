@@ -2,8 +2,16 @@ package net.aionstudios.jdc.logging;
 
 import java.io.PrintStream;
 
+/**
+ * Logs messages to the {@link Logger}'s {@link PrintStream}.
+ * @author Winter
+ *
+ */
 public class LogStream extends PrintStream {
 
+	/**
+	 * Creates a new stream which streams messages to a log file.
+	 */
 	public LogStream() {
 		super(Logger.getStream(), true);
 	}

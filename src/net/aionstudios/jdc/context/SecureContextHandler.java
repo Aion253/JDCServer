@@ -17,6 +17,11 @@ import net.aionstudios.jdc.server.util.RequestUtils;
 import net.aionstudios.jdc.server.util.ResponseUtils;
 import net.aionstudios.jdc.service.OutgoingRequestService;
 
+/**
+ * Handles secure HTTP contexts.
+ * @author Winter
+ *
+ */
 public class SecureContextHandler implements HttpHandler {
 
 	@Override

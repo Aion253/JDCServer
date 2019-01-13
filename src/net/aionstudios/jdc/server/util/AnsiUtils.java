@@ -1,5 +1,11 @@
 package net.aionstudios.jdc.server.util;
 
+
+/**
+ * A class with utilities for effective ANSI console escape strings.
+ * @author Winter
+ *
+ */
 public class AnsiUtils {
 	
 	public static final String ANSI_CLS = "\033[2J\033[;H";
@@ -30,6 +36,10 @@ public class AnsiUtils {
 	public static int ATT_REV = 7;
 	public static int ATT_NO = 8;
 	
+	/**
+	 * Changes console text states by attribute (ATT).
+	 * @param att		The ANSI text attribute to be set by number.
+	 */
 	public static void setAttribute(int att){
 		ATT = att;
 	}
@@ -43,6 +53,10 @@ public class AnsiUtils {
 	public static int FORE_CYAN = 36;
 	public static int FORE_WHITE = 37;
 	
+	/**
+	 * Changes the foreground color of the console (FORE).
+	 * @param fore		The ANSI text foreground color to be set by number.
+	 */
 	public static void setForeground(int fore){
 		FORE = fore;
 	}
@@ -56,14 +70,28 @@ public class AnsiUtils {
 	public static int BACK_CYAN = 46;
 	public static int BACK_WHITE = 47;
 	
+	/**
+	 * @return The ANSI escape code representing the current state of the ATT, FORE and BACK settings.
+	 */
 	public static String genAnsiCode(){
 		return "\u001b["+ATT+";"+FORE+";"+BACK+"m";
 	}
 	
+	/**
+	 * Changes the background color of the console (BACK).
+	 * @param fore		The ANSI text background color to be set by number.
+	 */
 	public static void setBackground(int back){
 		BACK = back;
 	}
 	
+	/**
+	 * Generates and returns a complete ANSI escape code given a console attribute, foreground and background color.
+	 * @param att		The ANSI text attribute to be set by number.
+	 * @param fore		The ANSI text foreground color to be set by number.
+	 * @param back		The ANSI text background color to be set by number.
+	 * @return An ANSI escape code representing the att, fore, and back settings passed to this method.
+	 */
 	public static String genAddAnsiCode(int att, int fore, int back){
 		setAttribute(att);
 		setForeground(fore);

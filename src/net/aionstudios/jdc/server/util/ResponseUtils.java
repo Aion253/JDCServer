@@ -76,6 +76,16 @@ public class ResponseUtils {
 		return true;
 	}
 	
+	/**
+	 * Responds with a file over HTTP.
+	 * 
+	 * @param rc		The HTTP {@link ResponseCode}.
+	 * @param he		The {@link HttpExchange} handling this request.
+	 * @param vars		The {@link RequestVariables} containing information about the request and response.
+	 * @param file		The file to be streamed in response to the user.
+	 * @param w			The {@link Website} on which the request was made.
+	 * @return			True if the file was successfully transferred, false otherwise.
+	 */
 	public static boolean fileHTTPResponse(ResponseCode rc, HttpExchange he, RequestVariables vars, File file, Website w) {
 		try {
 			if (!file.isFile()) {

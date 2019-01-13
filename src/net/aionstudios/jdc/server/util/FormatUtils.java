@@ -6,12 +6,17 @@ import java.util.LinkedHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * A utility class for JSON formatting.
+ * @author Winter
+ *
+ */
 public class FormatUtils {
 	
 	/**
 	 * Empties a {@link JSONObject}.
 	 * 
-	 * @param j An empty {@link JSONObject} that retains modified structure and references.
+	 * @param j A {@link JSONObject}.
 	 */
 	public static void clearJsonObject(JSONObject j) {
 		while(j.length()>0) {
@@ -19,6 +24,11 @@ public class FormatUtils {
 		}
 	}
 	
+	/**
+	 * Empties a {@link JSONArray}
+	 * 
+	 * @param j A {@link JSONArray}.
+	 */
 	public static void clearJsonArray(JSONArray j) {
 		while(j.length()>0) {
 			j.remove(0);
