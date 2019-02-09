@@ -60,6 +60,7 @@ public class ContextHandler implements HttpHandler {
 		Map<String, String> cookies = new HashMap<String, String>();
 		cookies = RequestUtils.resolveCookies(he);
 		String hostName = he.getRequestHeaders().getFirst("Host").split(":")[0];
+		boolean useGzip = he.getRequestHeaders().getFirst("Accept-Encoding").toLowerCase().contains("gzip");
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
 		String proxyUrl = wb.getProxyManager().getProxyUrl(requestSplit[0]);
 		if(proxyUrl!=null) {
@@ -69,15 +70,15 @@ public class ContextHandler implements HttpHandler {
 			or.getLastHeader("Content-Type");
 			v.setContentType(or.getLastHeader("Content-Type"));
 			v.setRedirect(or.getLastHeader("Location"));
-			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb);
+			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, useGzip);
 			return;
 		}
 		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);
 		if(requestSplit[0].endsWith(".jdc")) {
-			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb);
+			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb, useGzip);
 			return;
 		} else {
-			ResponseUtils.fileHTTPResponse(ResponseCode.OK, he, vars, wb.getContentFile(requestSplit[0]), wb);
+			ResponseUtils.fileHTTPResponse(ResponseCode.OK, he, vars, wb.getContentFile(requestSplit[0]), wb, useGzip);
 			return;
 		}
 	}

@@ -1,7 +1,10 @@
 package net.aionstudios.jdc.server.util;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,6 +65,17 @@ public class FormatUtils {
 			e.printStackTrace();
 		}
 		return j;
+	}
+	
+	private static SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+	public static String getLastModifiedAsHTTPString(long time) {
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return sdf.format(new Date(time));
+	}
+	
+	public static String getLastModifiedAsHTTPString(Date d) {
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		return sdf.format(d);
 	}
 
 }
