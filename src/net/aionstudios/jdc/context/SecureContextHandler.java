@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpHandler;
 import net.aionstudios.jdc.content.OutgoingRequest;
 import net.aionstudios.jdc.content.RequestVariables;
 import net.aionstudios.jdc.content.ResponseCode;
+import net.aionstudios.jdc.server.compression.CompressionEncoding;
 import net.aionstudios.jdc.server.content.GeneratorResponse;
 import net.aionstudios.jdc.server.content.PageParser;
 import net.aionstudios.jdc.server.content.Website;
@@ -60,7 +61,15 @@ public class SecureContextHandler implements HttpHandler {
 		Map<String, String> cookies = new HashMap<String, String>();
 		cookies = RequestUtils.resolveCookies(he);
 		String hostName = he.getRequestHeaders().getFirst("Host").split(":")[0];
-		boolean useGzip = he.getRequestHeaders().getFirst("Accept-Encoding").toLowerCase().contains("gzip");
+		CompressionEncoding ce = CompressionEncoding.NONE;
+		if(he.getRequestHeaders().containsKey("Accept-Encoding")) {
+			String accept = he.getRequestHeaders().getFirst("Accept-Encoding");
+			if(accept.contains("gzip")&&!accept.contains("gzip;q=0")&&!accept.contains("gzip; q=0")){
+				ce = CompressionEncoding.GZIP;
+			} else if (accept.contains("deflate")&&!accept.contains("deflate;q=0")&&!accept.contains("deflate; q=0")) {
+				ce = CompressionEncoding.DEFLATE;
+			}
+		}
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
 		if(!wb.isSslOn()) {
 			return;
@@ -73,15 +82,15 @@ public class SecureContextHandler implements HttpHandler {
 			or.getLastHeader("Content-Type");
 			v.setContentType(or.getLastHeader("Content-Type"));
 			v.setRedirect(or.getLastHeader("Location"));
-			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, useGzip);
+			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, ce);
 			return;
 		}
 		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);
 		if(requestSplit[0].endsWith(".jdc")) {
-			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb, useGzip);
+			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb, ce);
 			return;
 		} else {
-			ResponseUtils.fileHTTPResponse(ResponseCode.OK, he, vars, wb.getContentFile(requestSplit[0]), wb, useGzip);
+			ResponseUtils.fileHTTPResponse(ResponseCode.OK, he, vars, wb.getContentFile(requestSplit[0]), wb, ce);
 			return;
 		}
 	}

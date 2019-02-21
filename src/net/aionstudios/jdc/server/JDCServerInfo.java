@@ -2,20 +2,33 @@ package net.aionstudios.jdc.server;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.aionstudios.jdc.database.DatabaseConnector;
+import net.aionstudios.jdc.database.QueryResults;
 import net.aionstudios.jdc.server.content.ContentLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 import net.aionstudios.jdc.server.util.FormatUtils;
+import net.aionstudios.jdc.util.DatabaseUtils;
 
 public class JDCServerInfo {
 
@@ -94,6 +107,7 @@ public class JDCServerInfo {
 			}
 			ContentLoader.initializeClassLoader();
 			WebsiteManager.connectContentProcessors();
+			//y();
 			return true;
 		} catch (IOException e) {
 			System.err.println("Encountered an IOException during config file operations!");
