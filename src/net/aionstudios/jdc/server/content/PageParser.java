@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 
 import net.aionstudios.jdc.content.JDCHeadElement;
 import net.aionstudios.jdc.content.RequestVariables;
@@ -41,7 +42,8 @@ public class PageParser {
 		if(fileContent==null) {
 			return new GeneratorResponse("", ResponseCode.NO_CONTENT);
 		}
-		Document doc = doc = Jsoup.parse(fileContent);
+		Document doc = doc = Jsoup.parse(fileContent, "", Parser.xmlParser());
+		//doc.outputSettings().prettyPrint(false);
 		for(Element e : doc.getElementsByTag("jdc")) {
 			if(vars.getResponseCode().getCode()!=200) {
 				return new GeneratorResponse("", vars.getResponseCode());
