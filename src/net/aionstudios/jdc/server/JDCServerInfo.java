@@ -13,8 +13,10 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -76,6 +78,8 @@ public class JDCServerInfo {
 				dbConfig.put("username", "root");
 				dbConfig.put("password", "password");
 				dbConfig.put("port", 0);
+				dbConfig.put("autoReconnect", true);
+				dbConfig.put("timezone", "UTC");
 				dbConfig.put("enabled", false);
 				writeConfig(dbConfig, dcf);
 			} else {
@@ -87,10 +91,16 @@ public class JDCServerInfo {
 				String username = dbConfig.getString("username");
 				String password = dbConfig.getString("password");
 				int port = dbConfig.getInt("port");
-				if(port > 0 && port < 65536) {
-					DatabaseConnector.setupDatabase(hostname, database, Integer.toString(port), username, password);
+				boolean autoReconnect = dbConfig.has("autoReconnect")?dbConfig.getBoolean("autoReconnect"):true;
+				String timezone = dbConfig.has("timezone")?dbConfig.getString("timezone"):"UTC";
+				if(!Arrays.asList(TimeZone.getAvailableIDs()).contains(timezone)) {
+					System.err.println("Failed connecting to database! No such timezone as '"+timezone+"' in config file!");
 				} else {
-					DatabaseConnector.setupDatabase(hostname, database, username, password);
+					if(port > 0 && port < 65536) {
+						DatabaseConnector.setupDatabase(hostname, database, Integer.toString(port), username, password, autoReconnect, timezone);
+					} else {
+						DatabaseConnector.setupDatabase(hostname, database, username, password, autoReconnect, timezone);
+					}
 				}
 			}
 			JSONArray sa = webconfig.getJSONArray("websites");
