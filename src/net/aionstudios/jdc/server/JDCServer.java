@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.nixxcode.jvmbrotli.common.BrotliLoader;
 import com.sun.net.httpserver.HttpServer;
 
 public class JDCServer {
@@ -70,6 +71,7 @@ public class JDCServer {
 		server.start();
 		System.out.println("Server started on port " + port);
 		startSecureServer();
+		BrotliLoader.isBrotliAvailable();
 	}
 	
 	/**

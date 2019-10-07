@@ -64,7 +64,9 @@ public class ContextHandler implements HttpHandler {
 		CompressionEncoding ce = CompressionEncoding.NONE;
 		if(he.getRequestHeaders().containsKey("Accept-Encoding")) {
 			String accept = he.getRequestHeaders().getFirst("Accept-Encoding");
-			if(accept.contains("gzip")&&!accept.contains("gzip;q=0")&&!accept.contains("gzip; q=0")){
+			if(accept.contains("br")&&!accept.contains("br;q=0")&&!accept.contains("br; q=0")){
+				ce = CompressionEncoding.BR;
+			} else if(accept.contains("gzip")&&!accept.contains("gzip;q=0")&&!accept.contains("gzip; q=0")){
 				ce = CompressionEncoding.GZIP;
 			} else if (accept.contains("deflate")&&!accept.contains("deflate;q=0")&&!accept.contains("deflate; q=0")) {
 				ce = CompressionEncoding.DEFLATE;

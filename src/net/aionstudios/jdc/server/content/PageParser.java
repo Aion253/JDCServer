@@ -33,7 +33,6 @@ public class PageParser {
 	 * @return A {@link GeneratorReponse} having completed processing.
 	 */
 	public static GeneratorResponse parseGeneratePage(Website w, HttpExchange he, RequestVariables vars, File page) {
-		vars.setResponseCode(ResponseCode.OK);
 		if(!page.exists()) {
 			return new GeneratorResponse("", ResponseCode.NOT_FOUND);
 		}
@@ -45,9 +44,6 @@ public class PageParser {
 		Document doc = doc = Jsoup.parse(fileContent, "", Parser.xmlParser());
 		//doc.outputSettings().prettyPrint(false);
 		for(Element e : doc.getElementsByTag("jdc")) {
-			if(vars.getResponseCode().getCode()!=200) {
-				return new GeneratorResponse("", vars.getResponseCode());
-			}
 			if(e.hasAttr("javaexecute")) {
 				try {
 					w.locateProcessor(vars.getResponseCode(), e.attr("javaexecute")).startCompute(he, vars, pageVariables);
@@ -71,9 +67,7 @@ public class PageParser {
 			e.remove();
 		}
 		for(Element e : doc.getElementsByAttribute("javagenerate")) {
-			if(vars.getResponseCode().getCode()!=200) {
-				return new GeneratorResponse("", vars.getResponseCode());
-			}
+			
 			JDCHeadElement head = new JDCHeadElement(e.html());
 			try {
 				e.html(w.locateElementProcessor(vars.getResponseCode(), e.attr("javagenerate")).getContent(head, he, vars, pageVariables));

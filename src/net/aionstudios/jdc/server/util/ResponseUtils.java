@@ -11,12 +11,14 @@ import java.util.Date;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.nixxcode.jvmbrotli.enc.BrotliOutputStream;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import net.aionstudios.jdc.content.Cookie;
 import net.aionstudios.jdc.content.RequestVariables;
 import net.aionstudios.jdc.content.ResponseCode;
+import net.aionstudios.jdc.server.compression.BrotliCompressor;
 import net.aionstudios.jdc.server.compression.CompressionEncoding;
 import net.aionstudios.jdc.server.compression.DeflateCompressor;
 import net.aionstudios.jdc.server.compression.GZIPCompressor;
@@ -37,20 +39,24 @@ public class ResponseUtils {
 		String response = gResponse.getResponse();
 		ResponseCode rc = gResponse.getResponseCode();
 		String redirect = vars!=null ? vars.getRedirect() : null;
+		vars.setResponseCode(rc);
 		if(!(rc.getCode() >= 100)) {
 			rc = ResponseCode.OK;
 		}
-		if(rc.getCode()>=400) {
+		if((rc.getCode()>200&&rc.getCode()<300)||rc.getCode()>=400) {
 			try {
 				Headers respHeaders = he.getResponseHeaders();
 				respHeaders.set("Content-Type", vars.getContentType());
 				respHeaders.set("Last-Modified", FormatUtils.getLastModifiedAsHTTPString(System.currentTimeMillis()));
 				String errorResp = w.getErrorContent(rc, he, vars);
 				byte[] errRBytes;
-				if(ce.getValue()==CompressionEncoding.GZIP.getValue()) {
+				if(ce==CompressionEncoding.BR) {
+					respHeaders.set("Content-Encoding", "br");
+					errRBytes = BrotliCompressor.compress(errorResp);
+				} else if(ce==CompressionEncoding.GZIP) {
 					respHeaders.set("Content-Encoding", "gzip");
 					errRBytes = GZIPCompressor.compress(errorResp);
-				} else if (ce.getValue()==CompressionEncoding.DEFLATE.getValue()) {
+				} else if (ce==CompressionEncoding.DEFLATE) {
 					respHeaders.set("Content-Encoding", "deflate");
 					errRBytes = DeflateCompressor.compress(errorResp);
 				} else {
@@ -81,10 +87,13 @@ public class ResponseUtils {
 				respHeaders.set("Content-Type", vars.getContentType());
 				respHeaders.set("Last-Modified", FormatUtils.getLastModifiedAsHTTPString(System.currentTimeMillis()));
 				byte[] respBytes;
-				if(ce.getValue()==CompressionEncoding.GZIP.getValue()) {
+				if(ce==CompressionEncoding.BR) {
+					respHeaders.set("Content-Encoding", "br");
+					respBytes = BrotliCompressor.compress(response);
+				} else if(ce==CompressionEncoding.GZIP) {
 					respHeaders.set("Content-Encoding", "gzip");
 					respBytes = GZIPCompressor.compress(response);
-				} else if (ce.getValue()==CompressionEncoding.DEFLATE.getValue()) {
+				} else if (ce==CompressionEncoding.DEFLATE) {
 					respHeaders.set("Content-Encoding", "deflate");
 					respBytes = DeflateCompressor.compress(response);
 				} else {
@@ -118,25 +127,22 @@ public class ResponseUtils {
 	public static boolean fileHTTPResponse(ResponseCode rc, HttpExchange he, RequestVariables vars, File file, Website w, CompressionEncoding ce) {
 		try {
 			if (!file.isFile()) {
+				vars.setResponseCode(ResponseCode.NOT_FOUND);
 				generateHTTPResponse(new GeneratorResponse("", ResponseCode.NOT_FOUND), he, vars, file, w, ce);
 	        } else {
 	              // Object exists and is a file: accept with response code 200.
-	              String mime = "";
-	              if(file.getCanonicalPath().endsWith(".html")) mime = "text/html";
-	              if(file.getCanonicalPath().endsWith(".htm")) mime = "text/html";
-	              if(file.getCanonicalPath().endsWith(".jdc")) mime = "text/html";
-	              if(file.getCanonicalPath().endsWith(".js")) mime = "application/javascript";
-	              if(file.getCanonicalPath().endsWith(".css")) mime = "text/css";
-	              if(file.getCanonicalPath().endsWith(".svg")) mime = "image/svg+xml";
-	              if(file.getCanonicalPath().endsWith(".txt")) mime = "text/plain";
+	        	  String[] fileParts = file.getCanonicalPath().split("\\.");
+	              String mime = MimeUtils.getInstance().getMimeString(fileParts[fileParts.length-1]);
 
 	              Headers h = he.getResponseHeaders();
 	              if(mime.length()>0) {
 	            	  h.set("Content-Type", mime);
 	              }
-	              if(ce.getValue()==CompressionEncoding.GZIP.getValue()) {
+	              if(ce==CompressionEncoding.BR) {
+						h.set("Content-Encoding", "br");
+	              } else if(ce==CompressionEncoding.GZIP) {
 						h.set("Content-Encoding", "gzip");
-	              } else if (ce.getValue()==CompressionEncoding.DEFLATE.getValue()) {
+	              } else if (ce==CompressionEncoding.DEFLATE) {
 						h.set("Content-Encoding", "deflate");
 	              }
 	              h.set("Last-Modified", FormatUtils.getLastModifiedAsHTTPString(file.lastModified()));
@@ -149,7 +155,18 @@ public class ResponseUtils {
 	              he.sendResponseHeaders(200, 0);              
 	              
 	              
-	              if(ce.getValue()==CompressionEncoding.GZIP.getValue()) {
+	              if(ce==CompressionEncoding.BR) {
+	            	  final byte[] buffer = new byte[1024];
+	            	  FileInputStream fs = new FileInputStream(file);
+	            	  BrotliOutputStream os = new BrotliOutputStream(he.getResponseBody());
+		              int count;
+		              while ((count = fs.read(buffer)) > 0) {
+		                os.write(buffer,0,count);
+		              }
+		              fs.close();
+		              os.flush();
+		              os.close();
+	              } else if(ce==CompressionEncoding.GZIP) {
 	            	  final byte[] buffer = new byte[1024];
 	            	  FileInputStream fs = new FileInputStream(file);
 	            	  GZIPOutputStream os = new GZIPOutputStream(he.getResponseBody());
@@ -160,7 +177,7 @@ public class ResponseUtils {
 		              fs.close();
 		              os.flush();
 		              os.close();
-	              } else if (ce.getValue()==CompressionEncoding.DEFLATE.getValue()) {
+	              } else if (ce==CompressionEncoding.DEFLATE) {
 	            	  final byte[] buffer = new byte[1024];
 	            	  FileInputStream fs = new FileInputStream(file);
 	            	  DeflaterOutputStream os = new DeflaterOutputStream(he.getResponseBody());
