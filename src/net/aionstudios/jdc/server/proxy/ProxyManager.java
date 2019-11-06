@@ -45,6 +45,11 @@ public class ProxyManager {
 		if(context=="/") {
 			return null;
 		}
+		for(Map.Entry<String,String> entry : p.entrySet()) {
+			if(context.startsWith(entry.getKey())) {
+				return entry.getValue()+context.replaceFirst(entry.getKey(), "");
+			}
+		}
 		return p.get(context);
 	}
 

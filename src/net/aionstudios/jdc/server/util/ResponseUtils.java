@@ -36,6 +36,9 @@ public class ResponseUtils {
 	 * @return True if the response was sent successfully, false otherwise.
 	 */
 	public static boolean generateHTTPResponse(GeneratorResponse gResponse, HttpExchange he, RequestVariables vars, File page, Website w, CompressionEncoding ce) {
+		if(vars.getStreamFile()!=null) {
+			return fileHTTPResponse(he, vars, vars.getStreamFile(), w, ce);
+		}
 		String response = gResponse.getResponse();
 		ResponseCode rc = gResponse.getResponseCode();
 		String redirect = vars!=null ? vars.getRedirect() : null;
@@ -124,9 +127,10 @@ public class ResponseUtils {
 	 * @param w			The {@link Website} on which the request was made.
 	 * @return			True if the file was successfully transferred, false otherwise.
 	 */
-	public static boolean fileHTTPResponse(ResponseCode rc, HttpExchange he, RequestVariables vars, File file, Website w, CompressionEncoding ce) {
+	public static boolean fileHTTPResponse(HttpExchange he, RequestVariables vars, File file, Website w, CompressionEncoding ce) {
 		try {
 			if (!file.isFile()) {
+				vars.setStreamFile(null);
 				vars.setResponseCode(ResponseCode.NOT_FOUND);
 				generateHTTPResponse(new GeneratorResponse("", ResponseCode.NOT_FOUND), he, vars, file, w, ce);
 	        } else {

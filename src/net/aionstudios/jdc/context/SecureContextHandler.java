@@ -1,11 +1,21 @@
 package net.aionstudios.jdc.context;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.RequestContext;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import net.aionstudios.jdc.content.MultipartFile;
 import net.aionstudios.jdc.content.OutgoingRequest;
 import net.aionstudios.jdc.content.RequestVariables;
 import net.aionstudios.jdc.content.ResponseCode;
@@ -55,9 +65,6 @@ public class SecureContextHandler implements HttpHandler {
 			getQuery = RequestUtils.resolveGetQuery(requestSplit[1]);
 		}
 		Map<String, String> postQuery = new HashMap<String, String>();
-		if(he.getRequestMethod().equalsIgnoreCase("POST")) {
-			postQuery = RequestUtils.resolvePostQuery(he);
-		}
 		Map<String, String> cookies = new HashMap<String, String>();
 		cookies = RequestUtils.resolveCookies(he);
 		String hostName = he.getRequestHeaders().getFirst("Host").split(":")[0];
@@ -80,19 +87,73 @@ public class SecureContextHandler implements HttpHandler {
 		if(proxyUrl!=null) {
 			OutgoingRequest or = new OutgoingRequest("", null);
 			String rp = OutgoingRequestService.executePost(proxyUrl+ (requestSplit[1].length()>0 ? "?" : "") + requestSplit[1], OutgoingRequestService.postMapToString(postQuery), or);
-			RequestVariables v = new RequestVariables(null, null, null, null);
+			RequestVariables v = new RequestVariables(null, null, null, null, null);
 			or.getLastHeader("Content-Type");
 			v.setContentType(or.getLastHeader("Content-Type"));
 			v.setRedirect(or.getLastHeader("Location"));
 			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, ce);
 			return;
 		}
-		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0]);
+		//File Uploads
+		List<MultipartFile> mfs = new ArrayList<MultipartFile>();
+		List<FileItem> deleteLater = new ArrayList<>();
+		String cT = he.getRequestHeaders().containsKey("Content-Type") ? he.getRequestHeaders().getFirst("Content-Type") : "text/html";
+		if(cT.contains("multipart/form-data")||cT.contains("multipart/stream")) {
+			DiskFileItemFactory d = new DiskFileItemFactory();
+			try {
+				ServletFileUpload up = new ServletFileUpload(d);
+				List<FileItem> result = up.parseRequest(new RequestContext() {
+
+					@Override
+					public String getCharacterEncoding() {
+						return "UTF-8";
+					}
+
+					@Override
+					public int getContentLength() {
+						return 0; //tested to work with 0 as return
+					}
+
+					@Override
+					public String getContentType() {
+						return cT;
+					}
+
+					@Override
+					public InputStream getInputStream() throws IOException {
+						return he.getRequestBody();
+					}
+
+				});
+				System.out.println("B");
+				for(FileItem fi : result) {
+					if(!fi.isFormField()) {
+			        	mfs.add(new MultipartFile(fi.getFieldName(), fi.getName(), fi.getContentType(), fi.getInputStream(), fi.getSize()));
+			        	deleteLater.add(fi);
+			        } else {
+			        	postQuery.put(fi.getFieldName(), fi.getString());
+			        }
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			if(he.getRequestMethod().equalsIgnoreCase("POST")) {
+				postQuery = RequestUtils.resolvePostQuery(he);
+			}
+		}
+		RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0], mfs);
 		if(requestSplit[0].endsWith(".jdc")) {
 			ResponseUtils.generateHTTPResponse(PageParser.parseGeneratePage(wb, he, vars, wb.getContentFile(requestSplit[0])), he, vars, wb.getContentFile(requestSplit[0]), wb, ce);
+			for(FileItem fi : deleteLater) {
+            	fi.delete();
+            }
 			return;
 		} else {
-			ResponseUtils.fileHTTPResponse(ResponseCode.OK, he, vars, wb.getContentFile(requestSplit[0]), wb, ce);
+			ResponseUtils.fileHTTPResponse(he, vars, wb.getContentFile(requestSplit[0]), wb, ce);
+			for(FileItem fi : deleteLater) {
+            	fi.delete();
+            }
 			return;
 		}
 	}

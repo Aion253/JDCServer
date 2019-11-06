@@ -133,6 +133,9 @@ public class MimeUtils {
 		mimeExtensionMap.putIfAbsent("3gp", "video/3gpp");
 		mimeExtensionMap.putIfAbsent("3g2", "video/3gpp");
 		mimeExtensionMap.putIfAbsent("7z", "application/x-7z-compressed");
+		mimeExtensionMap.putIfAbsent("flac", "audio/flac");
+		mimeExtensionMap.putIfAbsent("m4a", "audio/m4a");
+		mimeExtensionMap.putIfAbsent("m4v", "video/m4a");
 	}
 	
 	public static MimeUtils getInstance() {
