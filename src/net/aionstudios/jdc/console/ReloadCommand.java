@@ -49,7 +49,7 @@ public class ReloadCommand extends Command {
 						} else {
 							System.err.println("Failed reloading content processor '"+cp.get(i).getName()+"' for site '"+w.getName()+"'! JDC missing!");
 						}
-						break;
+						return;
 					}
 				}
 				System.err.println("Failed reloading content processor '"+args[2]+"' for site '"+w.getName()+"'! No content processor!");

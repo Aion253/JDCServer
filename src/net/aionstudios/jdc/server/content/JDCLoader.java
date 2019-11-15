@@ -28,7 +28,7 @@ public class JDCLoader {
 	 */
 	public static void initializeClassLoader() {
 		//Should read a file for urls and other information first, then load classes.
-		ucl = new URLClassLoader(urls.toArray(new URL[0]), JDCLoader.class.getClassLoader());
+		ucl = new URLClassLoader(urls.toArray(new URL[0]), DependencyLoader.getUrlClassLoader());
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class JDCLoader {
 		try {
 			if(f.exists()) {
 				URL[] u = {f.toURI().toURL()};
-				Class<?> classToLoad = Class.forName(jdcClass, true, new URLClassLoader(u, JDCLoader.class.getClassLoader()));
+				Class<?> classToLoad = Class.forName(jdcClass, true, new URLClassLoader(u, DependencyLoader.getUrlClassLoader()));
 				JDC instance = (JDC) classToLoad.newInstance();
 				return instance;
 			}

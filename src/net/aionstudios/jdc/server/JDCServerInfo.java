@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import net.aionstudios.jdc.database.DatabaseConnector;
 import net.aionstudios.jdc.database.QueryResults;
+import net.aionstudios.jdc.server.content.DependencyLoader;
 import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
@@ -139,6 +140,7 @@ public class JDCServerInfo {
 			httpsPort = serverConfig.getInt("https_port");
 			JSONObject fo = serverConfig.getJSONObject("enable_features");
 			enableBrotli = fo.getBoolean("brotli");
+			DependencyLoader.loadDependencies();
 			JDCLoader.initializeClassLoader();
 			WebsiteManager.connectContentProcessors();
 			return true;
