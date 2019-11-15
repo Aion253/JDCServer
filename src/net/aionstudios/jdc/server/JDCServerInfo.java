@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 import net.aionstudios.jdc.database.DatabaseConnector;
 import net.aionstudios.jdc.database.QueryResults;
-import net.aionstudios.jdc.server.content.ContentLoader;
+import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 import net.aionstudios.jdc.server.util.FormatUtils;
@@ -34,12 +34,18 @@ import net.aionstudios.jdc.util.DatabaseUtils;
 
 public class JDCServerInfo {
 
-	public static String JDCS_VER = "1.0.0";
-	public static String JDCS_CONFIG = "./sites.json";
-	public static String CONFIG_DB = "./database.json";
+	public static final String JDCS_VER = "1.0.0";
+	public static final String JDCS_CONFIG = "./sites.json";
+	public static final String CONFIG_DB = "./database.json";
+	public static final String CONFIG_SERVER = "./config.json";
 	
 	private static JSONObject webconfig;
 	private static JSONObject dbConfig;
+	private static JSONObject serverConfig;
+	
+	private static int httpPort = 80;
+	private static int httpsPort = 443;
+	private static boolean enableBrotli = false;
 	
 	/**
 	 * Reads configurable information when the server starts and handles setup if necessary.
@@ -50,6 +56,7 @@ public class JDCServerInfo {
 	public static boolean readConfigsAtStart() {
 		webconfig = FormatUtils.getLinkedJsonObject();
 		dbConfig = FormatUtils.getLinkedJsonObject();
+		serverConfig = FormatUtils.getLinkedJsonObject();
 		try {
 			File dbcf = new File(JDCS_CONFIG);
 			if(!dbcf.exists()) {
@@ -85,6 +92,19 @@ public class JDCServerInfo {
 			} else {
 				dbConfig = readConfig(dcf);
 			}
+			File scf = new File(CONFIG_SERVER);
+			if(!scf.exists()) {
+				scf.getParentFile().mkdirs();
+				scf.createNewFile();
+				JSONObject fo = new JSONObject();
+				fo.put("brotli", true);
+				serverConfig.put("enable_features", fo);
+				serverConfig.put("http_port", 80);
+				serverConfig.put("https_port", 443);
+				writeConfig(serverConfig, scf);
+			} else {
+				serverConfig = readConfig(scf);
+			}
 			if(dbConfig.getBoolean("enabled")) {
 				String hostname = dbConfig.getString("hostname");
 				String database = dbConfig.getString("database");
@@ -115,9 +135,12 @@ public class JDCServerInfo {
 				}
 				new Website(name, addresses, sslOn);
 			}
-			ContentLoader.initializeClassLoader();
+			httpPort = serverConfig.getInt("http_port");
+			httpsPort = serverConfig.getInt("https_port");
+			JSONObject fo = serverConfig.getJSONObject("enable_features");
+			enableBrotli = fo.getBoolean("brotli");
+			JDCLoader.initializeClassLoader();
 			WebsiteManager.connectContentProcessors();
-			//y();
 			return true;
 		} catch (IOException e) {
 			System.err.println("Encountered an IOException during config file operations!");
@@ -209,6 +232,22 @@ public class JDCServerInfo {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public static boolean isEnableBrotli() {
+		return enableBrotli;
+	}
+
+	public static void setEnableBrotli(boolean enableBrotli) {
+		JDCServerInfo.enableBrotli = enableBrotli;
+	}
+
+	public static int getHttpPort() {
+		return httpPort;
+	}
+
+	public static int getHttpsPort() {
+		return httpsPort;
 	}
 	
 }

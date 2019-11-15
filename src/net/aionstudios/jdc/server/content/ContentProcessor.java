@@ -33,13 +33,13 @@ public class ContentProcessor {
 	 * @param name
 	 * @param javaArchive
 	 * @param mainClass
-	 * @see {@link ContentLoader}
+	 * @see {@link JDCLoader}
 	 */
 	public ContentProcessor(Website website, String name, File javaArchive, String mainClass) {
 		this.javaArchive = javaArchive;
 		this.mainClass = mainClass;
 		this.name = name;
-		ContentLoader.addClassLoaderURL(javaArchive);
+		JDCLoader.addClassLoaderURL(javaArchive);
 		website.addContentProcessor(this);
 	}
 	
@@ -59,12 +59,20 @@ public class ContentProcessor {
 		return javaArchive;
 	}
 	
+	public String getMainClass() {
+		return mainClass;
+	}
+	
+	public void setJDC(JDC jdc) {
+		this.jdc = jdc;
+	}
+	
 	/**
-	 * Uses the {@link ContentLoader} to create a new JDC instance, as referenced in this classes constructor by its fully qualified name within the given archive.
+	 * Uses the {@link JDCLoader} to create a new JDC instance, as referenced in this classes constructor by its fully qualified name within the given archive.
 	 */
 	public void connectContentProcessor() {
 		if(!connected) {
-			this.jdc = ContentLoader.getJDCFromLibrary(mainClass);
+			this.jdc = JDCLoader.getJDCFromLibrary(mainClass);
 			this.jdc.initialize();
 			connected = true;
 		}

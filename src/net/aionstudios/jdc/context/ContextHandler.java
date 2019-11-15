@@ -19,6 +19,7 @@ import net.aionstudios.jdc.content.MultipartFile;
 import net.aionstudios.jdc.content.OutgoingRequest;
 import net.aionstudios.jdc.content.RequestVariables;
 import net.aionstudios.jdc.content.ResponseCode;
+import net.aionstudios.jdc.server.JDCServerInfo;
 import net.aionstudios.jdc.server.compression.CompressionEncoding;
 import net.aionstudios.jdc.server.content.GeneratorResponse;
 import net.aionstudios.jdc.server.content.PageParser;
@@ -36,7 +37,7 @@ import net.aionstudios.jdc.service.OutgoingRequestService;
 public class ContextHandler implements HttpHandler {
 
 	@Override
-	public void handle(HttpExchange he) {
+	public void handle(final HttpExchange he) {
 		long nanoStart = System.nanoTime();
 		/*TODO
 		 * extend information stored about websites in the website file
@@ -71,7 +72,7 @@ public class ContextHandler implements HttpHandler {
 		CompressionEncoding ce = CompressionEncoding.NONE;
 		if(he.getRequestHeaders().containsKey("Accept-Encoding")) {
 			String accept = he.getRequestHeaders().getFirst("Accept-Encoding");
-			if(accept.contains("br")&&!accept.contains("br;q=0")&&!accept.contains("br; q=0")){
+			if(JDCServerInfo.isEnableBrotli()&&accept.contains("br")&&!accept.contains("br;q=0")&&!accept.contains("br; q=0")){
 				ce = CompressionEncoding.BR;
 			} else if(accept.contains("gzip")&&!accept.contains("gzip;q=0")&&!accept.contains("gzip; q=0")){
 				ce = CompressionEncoding.GZIP;
@@ -80,21 +81,10 @@ public class ContextHandler implements HttpHandler {
 			}
 		}
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
-		String proxyUrl = wb.getProxyManager().getProxyUrl(requestSplit[0]);
-		if(proxyUrl!=null) {
-			OutgoingRequest or = new OutgoingRequest("", null);
-			String rp = OutgoingRequestService.executePost(proxyUrl+ (requestSplit[1].length()>0 ? "?" : "") + requestSplit[1], OutgoingRequestService.postMapToString(postQuery), or);
-			RequestVariables v = new RequestVariables(null, null, null, null, null);
-			or.getLastHeader("Content-Type");
-			v.setContentType(or.getLastHeader("Content-Type"));
-			v.setRedirect(or.getLastHeader("Location"));
-			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, ce);
-			return;
-		}
 		//File Uploads
 		List<MultipartFile> mfs = new ArrayList<MultipartFile>();
 		List<FileItem> deleteLater = new ArrayList<>();
-		String cT = he.getRequestHeaders().containsKey("Content-Type") ? he.getRequestHeaders().getFirst("Content-Type") : "text/html";
+		final String cT = he.getRequestHeaders().containsKey("Content-Type") ? he.getRequestHeaders().getFirst("Content-Type") : "text/html";
 		if(cT.contains("multipart/form-data")||cT.contains("multipart/stream")) {
 			DiskFileItemFactory d = new DiskFileItemFactory();
 			try {
@@ -122,7 +112,6 @@ public class ContextHandler implements HttpHandler {
 					}
 
 				});
-				System.out.println("B");
 				for(FileItem fi : result) {
 					if(!fi.isFormField()) {
 			        	mfs.add(new MultipartFile(fi.getFieldName(), fi.getName(), fi.getContentType(), fi.getInputStream(), fi.getSize()));
@@ -138,6 +127,17 @@ public class ContextHandler implements HttpHandler {
 			if(he.getRequestMethod().equalsIgnoreCase("POST")) {
 				postQuery = RequestUtils.resolvePostQuery(he);
 			}
+		}
+		String proxyUrl = wb.getProxyManager().getProxyUrl(requestSplit[0]);
+		if(proxyUrl!=null) {
+			OutgoingRequest or = new OutgoingRequest("", null);
+			String rp = OutgoingRequestService.executePost(proxyUrl+ (requestSplit[1].length()>0 ? "?" : "") + requestSplit[1], OutgoingRequestService.postMapToString(postQuery), or);
+			RequestVariables v = new RequestVariables(null, null, null, null, null);
+			or.getLastHeader("Content-Type");
+			v.setContentType(or.getLastHeader("Content-Type"));
+			v.setRedirect(or.getLastHeader("Location"));
+			ResponseUtils.generateHTTPResponse(new GeneratorResponse(or.getContent(), v.getResponseCode()), he, v, null, wb, ce);
+			return;
 		}
         RequestVariables vars = new RequestVariables(postQuery, getQuery, cookies, requestSplit[0], mfs);
 		if(requestSplit[0].endsWith(".jdc")) {

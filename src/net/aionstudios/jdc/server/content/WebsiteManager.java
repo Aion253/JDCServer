@@ -59,7 +59,7 @@ public class WebsiteManager {
 	
 	/**
 	 * Connects each of the {@link ContentProcessor}s from every {@link Website}.
-	 * @see {@link ContentLoader}
+	 * @see {@link JDCLoader}
 	 */
 	public static void connectContentProcessors() {
 		for(Website w : websites) {

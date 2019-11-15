@@ -25,6 +25,7 @@ public class ProxyManager {
 	 * @param proxyUrl		The {@link URL} string to which the request should be proxied.
 	 */
 	public void putProxy(String context, String proxyUrl) {
+		if(proxyUrl=="/")return;
 		p.put(context, proxyUrl);
 	}
 	

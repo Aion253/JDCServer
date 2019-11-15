@@ -83,7 +83,7 @@ public class Website {
 	
 	/**
 	 * Reads the Java {@link JDC} processor configuration file for this website and registers a {@link ContentProcessor} to load external archives into the JVM.
-	 * @see {@link ContentLoader}
+	 * @see {@link JDCLoader}
 	 */
 	public void readProcessorsConfig() {
 		if(processorConfig.exists()) {
@@ -258,7 +258,7 @@ public class Website {
 	 * <p>
 	 * An unlimited number of additional archives containing {@link JDC} main classes can be added to a website.
 	 * @param processor		The {@link ContentProcessor} to be added.
-	 * @see {@link ContentLoader}
+	 * @see {@link JDCLoader}
 	 */
 	public void addContentProcessor(ContentProcessor processor) {
 		for(ContentProcessor cp : processors) {

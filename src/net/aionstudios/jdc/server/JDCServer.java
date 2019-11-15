@@ -1,5 +1,8 @@
 package net.aionstudios.jdc.server;
 
+import net.aionstudios.jdc.console.JDCConsole;
+import net.aionstudios.jdc.console.ListCommand;
+import net.aionstudios.jdc.console.ReloadCommand;
 import net.aionstudios.jdc.content.ResponseCode;
 import net.aionstudios.jdc.context.ContextHandler;
 import net.aionstudios.jdc.logging.LogOut;
@@ -25,7 +28,6 @@ import com.sun.net.httpserver.HttpServer;
 public class JDCServer {
 	
 	private static HttpServer server;
-	private static int port = 80;
 	
 	/*
 	 * Accesses a series of folders placed next to the server jar file.
@@ -60,7 +62,7 @@ public class JDCServer {
 		JDCServerInfo.readConfigsAtStart();
 		//System.out.println(PageParser.parseGeneratePage(w, null, null, null, w.getContentFile("/index.jdc")));
 		try {
-			server = HttpServer.create(new InetSocketAddress(port), 0);
+			server = HttpServer.create(new InetSocketAddress(JDCServerInfo.getHttpPort()), 0);
 		} catch (IOException e) {
 			System.err.println("Failed to start HTTP Server!");
 			e.printStackTrace();
@@ -69,9 +71,12 @@ public class JDCServer {
 		server.createContext("/", new ContextHandler());
 		server.setExecutor(Executors.newCachedThreadPool());
 		server.start();
-		System.out.println("Server started on port " + port);
+		System.out.println("Server started on port " + JDCServerInfo.getHttpPort());
+		new ReloadCommand();
+		new ListCommand();
+		JDCConsole.getInstance().startConsoleThread();
 		startSecureServer();
-		BrotliLoader.isBrotliAvailable();
+		if(JDCServerInfo.isEnableBrotli()) BrotliLoader.isBrotliAvailable();
 	}
 	
 	/**
@@ -85,7 +90,7 @@ public class JDCServer {
 		} else {
 			try {
 				certsConfig.createNewFile();
-				certsJson.put("enable_sll_server", false);
+				certsJson.put("enable_ssl_server", false);
 				certsJson.put("jks_certificate", "cert.jks");
 				certsJson.put("store_password", "changeit");
 				certsJson.put("key_password", "changeit");
@@ -100,7 +105,7 @@ public class JDCServer {
 			}
 		}
 		try {
-			boolean enabled = certsJson.getBoolean("enable_sll_server");
+			boolean enabled = certsJson.getBoolean("enable_ssl_server");
 			if(enabled) {
 				String jksCertificate = certsJson.getString("jks_certificate");
 				String storePassword = certsJson.getString("store_password");

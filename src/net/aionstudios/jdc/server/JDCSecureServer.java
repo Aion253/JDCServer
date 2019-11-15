@@ -34,7 +34,6 @@ public class JDCSecureServer {
 	
 	private static boolean started = false;
 	private static HttpsServer server;
-	private static int port = 443;
 	
 	/*
 	 * To generate a compatible JKS certificate it is recommended to get the default cert/key files from a certificate authority
@@ -75,7 +74,7 @@ public class JDCSecureServer {
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 				tmf.init(keystore);
 				//initialize server
-				server = HttpsServer.create(new InetSocketAddress(port), 0);
+				server = HttpsServer.create(new InetSocketAddress(JDCServerInfo.getHttpsPort()), 0);
 				// create ssl context
 				SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
 				// setup the HTTPS context and parameters
@@ -122,7 +121,7 @@ public class JDCSecureServer {
 				server.createContext("/", new SecureContextHandler());
 				server.setExecutor(Executors.newCachedThreadPool());
 				server.start();
-				System.out.println("Secure server started on port " + port);
+				System.out.println("Secure server started on port " + JDCServerInfo.getHttpsPort());
 			}
 		}
 	}
