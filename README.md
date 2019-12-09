@@ -66,11 +66,13 @@ It is safe to delete the PKCS12 file that was used during this process but not r
 A few problems may arise during this process or with certificate validity in testing.
 
 **OpenSSL**
+
 Each of the files required for the PKCS12 export are not normally provided to certificate holders. Namely you will likely have to find the Certificate Authority's certificate file on your own.
 
 Also make sure that your alias does not cause a file system naming conflict or match the CA name, which can be root, for safety.
 
 **KeyTool**
+
 For JDC's certificate management to work the store and key password for the destination JKS file must match exactly.
 
 The password for the source keystore should be used if one was set though the instructions above do not. If one was not set anything can be passed after the ```srcstorepass``` argument, or it can be removed.
@@ -78,9 +80,11 @@ The password for the source keystore should be used if one was set though the in
 Ensure the alias matches exactly to the one used in creating the PKCS12 file.
 
 **File Types**
+
 Make sure you're including the file type at the end of all file arguments in the above commands. The don't inherently have to match to the file type of their contents, though they should, and OpenSSL and KeyTool will not assume they do.
 
 **Invalid Certificate**
+
 Certificates that were generated locally or as part of a certificate chain may fail at different times for different reasons.
 
 Certificates that are locally generated, while they will securely encrypt traffic, are not trusted by end-user's browsers. A valid certificate authority must sign the issues certificate otherwise most major browsers will alert the user that their connection is not secure.
