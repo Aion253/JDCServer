@@ -33,9 +33,13 @@ import net.aionstudios.jdc.server.content.WebsiteManager;
 import net.aionstudios.jdc.server.util.FormatUtils;
 import net.aionstudios.jdc.util.DatabaseUtils;
 
+/**
+ * Handles configuration files and application setting accessibility.
+ * @author Winter Roberts
+ */
 public class JDCServerInfo {
 
-	public static final String JDCS_VER = "1.0.0";
+	public static final String JDCS_VER = "1.0.1";
 	public static final String JDCS_CONFIG = "./sites.json";
 	public static final String CONFIG_DB = "./database.json";
 	public static final String CONFIG_SERVER = "./config.json";
@@ -51,7 +55,6 @@ public class JDCServerInfo {
 	/**
 	 * Reads configurable information when the server starts and handles setup if necessary.
 	 * Should a config file not exist it will be created and the application terminated.
-	 * 
 	 * @return True if the config was available and processed, false otherwise.
 	 */
 	public static boolean readConfigsAtStart() {
@@ -157,7 +160,6 @@ public class JDCServerInfo {
 	
 	/**
 	 * Writes the provided {@link JSONObject} to the file system, optimistically as a configuration file.
-	 * 
 	 * @param j	The {@link JSONObject} to be serialized into the file system.
 	 * @param f	The {@link File} object identifying where the {@link JSONObject} should be saved onto the file system.
 	 * @return True if the file was written without error, false otherwise.
@@ -190,7 +192,6 @@ public class JDCServerInfo {
 	
 	/**
 	 * Deserializes a {@link JSONObject} from a file on the file system and returns it.
-	 * 
 	 * @param f	The {@link File} object, representing a file containing JSON data on the file system.
 	 * @return	A {@link JSONObject} representing the file provided or null if it could not be read.
 	 */
@@ -217,6 +218,11 @@ public class JDCServerInfo {
 		}
 	}
 	
+	/**
+	 * Returns the content of the named {@link File} in the file system.
+	 * @param f The {@link File} to be read from.
+	 * @return The contents, a String, of the named {@link File}
+	 */
 	public static String readFile(File f) {
 		if(!f.exists()) {
 			System.err.println("Failed reading file: '"+f.toString()+"'. No such file!");
@@ -236,18 +242,34 @@ public class JDCServerInfo {
 		}
 	}
 
+	/**
+	 * Most useful for users building to Java 7 as the Brotli library does
+	 * not have support for it.
+	 * @return True if brotli is enabled in the settings, false otherwise.
+	 */
 	public static boolean isEnableBrotli() {
 		return enableBrotli;
 	}
 
+	/**
+	 * Enables or disables {@link BrotliCompressor} as an available {@link CompressionEncoding} for
+	 * the application.
+	 * @param enableBrotli True to enabled, or false to disable.
+	 */
 	public static void setEnableBrotli(boolean enableBrotli) {
 		JDCServerInfo.enableBrotli = enableBrotli;
 	}
 
+	/**
+	 * @return The port which should be used for HTTP requests.
+	 */
 	public static int getHttpPort() {
 		return httpPort;
 	}
 
+	/**
+	 * @return The port which should be used for HTTPS requests.
+	 */
 	public static int getHttpsPort() {
 		return httpsPort;
 	}

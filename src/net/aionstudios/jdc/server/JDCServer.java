@@ -25,6 +25,10 @@ import org.json.JSONObject;
 import com.nixxcode.jvmbrotli.common.BrotliLoader;
 import com.sun.net.httpserver.HttpServer;
 
+/**
+ * Handles requests to the insecure web port for this server.
+ * @author Winter Roberts
+ */
 public class JDCServer {
 	
 	private static HttpServer server;
@@ -36,20 +40,14 @@ public class JDCServer {
 	 * required, one for each website, a default is provided with the server and comes with
 	 * extensive description to assist new users.
 	 * 
-	 * The "computed" folder inside of this holds all of the precomputed jdc pages and leaves
-	 * the non-cron based page updates to be processed per request in order to save server resources.
+	 * It contains a folder labeled "content" which holds any files (css, js, html and jdc) that are sent to the user.
 	 * 
-	 * It also contains a folder labeled "content" which holds any files (css, js, html and jdc) that are sent to the user.
-	 * 
-	 * Finally, it contains a folder labeled "java" which contains jar files imported into the 
+	 * Also, it contains a folder labeled "java" which contains jar files imported into the 
 	 * JVM by the server after reading this website's config file.
 	 * 
 	 * The JSON config file(s) are placed at the top of each website folder and will contain
 	 * all necessary information about the website and importing the user code properly
-	 * as well as offering settings for htaccess like stuffs.
-	 * 
-	 * Personally, as I'm using forefront to route, I have a separate website for each subdomain
-	 * but the configs will offer settings for this.
+	 * as well as offering settings.
 	 */
 	/**
 	 * Starts a new {@link HttpServer} as well as the server's {@link Logger} and loads config files.
@@ -60,7 +58,6 @@ public class JDCServer {
 		LogOut.setStreamPrefix("JDC Server");
 		StandardOverride.enableOverride();
 		JDCServerInfo.readConfigsAtStart();
-		//System.out.println(PageParser.parseGeneratePage(w, null, null, null, w.getContentFile("/index.jdc")));
 		try {
 			server = HttpServer.create(new InetSocketAddress(JDCServerInfo.getHttpPort()), 0);
 		} catch (IOException e) {

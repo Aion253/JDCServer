@@ -5,8 +5,7 @@ package net.aionstudios.jdc.logging;
  * <p>
  * Sets the System "standard" output stream to a new {@link LogStream}
  * and the System "standard" error output stream to a new {@link LogErrorStream}.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class StandardOverride {
 	

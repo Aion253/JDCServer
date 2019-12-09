@@ -27,8 +27,7 @@ import net.aionstudios.jdc.context.SecureContextHandler;
 
 /**
  * An HTTPS enabled instance of the {@link JDCServer}, to handle secured requests.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class JDCSecureServer {
 	

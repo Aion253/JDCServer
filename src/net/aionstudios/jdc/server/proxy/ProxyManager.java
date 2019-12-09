@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The proxy manager maps request {@link URL}s to outgoing requests per {@link Website}.
- * @author Winter
- *
+ * Maps request {@link URL}s to outgoing requests per {@link Website}.
+ * @author Winter Roberts
  */
 public class ProxyManager {
 	

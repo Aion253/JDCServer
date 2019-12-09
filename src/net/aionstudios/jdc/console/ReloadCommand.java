@@ -8,6 +8,10 @@ import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 
+/**
+ * A {@link Command} that reloads content processors for the application, website, or single processors.
+ * @author Winter Roberts
+ */
 public class ReloadCommand extends Command {
 
 	public ReloadCommand() {

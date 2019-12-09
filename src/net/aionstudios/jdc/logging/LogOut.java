@@ -8,10 +8,8 @@ import org.fusesource.jansi.AnsiConsole;
 
 /**
  * Handles writing to both the log streams and live console if one is visible.
- * <p>
  * Adds time, type and stream prefix to messages.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class LogOut {
 	
@@ -34,7 +32,7 @@ public class LogOut {
 			text = "["+getStreamTime()+" INFO]: "+text;
 		}
 		lock.lock();
-		Logger.getStream().println(text.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "").replaceAll("\\n", n));
+		Logger.getStream().println(text.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "").replaceAll("\\r\\n|\\r|\\n", n));
 		AnsiConsole.out.println(text);
 		lock.unlock();
 	}
@@ -45,7 +43,7 @@ public class LogOut {
 	 */
 	public static void print(String text){
 		lock.lock();
-		Logger.getStream().print(text.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "").replaceAll("\\n", n));
+		Logger.getStream().print(text.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "").replaceAll("\\r\\n|\\r|\\n", n));
 		AnsiConsole.out.print(text);
 		lock.unlock();
 	}
@@ -59,7 +57,7 @@ public class LogOut {
 	public static void errpl(String text){
 		text = "["+getStreamTime()+" SERVER ERROR]: "+text;
 		lock.lock();
-		Logger.getStream().println(text.replaceAll("\\n", n));
+		Logger.getStream().println(text.replaceAll("\\r\\n|\\r|\\n", n));
 		AnsiConsole.err.println(text);
 		lock.unlock();
 	}
@@ -70,7 +68,7 @@ public class LogOut {
 	 */
 	public static void errp(String text){
 		lock.lock();
-		Logger.getStream().print(text.replaceAll("\\n", n));
+		Logger.getStream().print(text.replaceAll("\\r\\n|\\r|\\n", n));
 		AnsiConsole.err.print(text);
 		lock.unlock();
 	}

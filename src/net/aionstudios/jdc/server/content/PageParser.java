@@ -19,8 +19,7 @@ import net.aionstudios.jdc.server.util.ConsoleErrorUtils;
 
 /**
  * Locates pages, reads them, and completes processing and modification via {@link Processor}s and {@link ElementProcessor}s when they are found.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class PageParser {
 	
@@ -42,7 +41,6 @@ public class PageParser {
 			return new GeneratorResponse("", ResponseCode.NO_CONTENT);
 		}
 		Document doc = doc = Jsoup.parse(fileContent, "", Parser.xmlParser());
-		//doc.outputSettings().prettyPrint(false);
 		for(Element e : doc.getElementsByTag("jdc")) {
 			if(e.hasAttr("javaexecute")) {
 				try {

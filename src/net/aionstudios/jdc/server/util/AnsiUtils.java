@@ -3,8 +3,7 @@ package net.aionstudios.jdc.server.util;
 
 /**
  * A class with utilities for effective ANSI console escape strings.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class AnsiUtils {
 	

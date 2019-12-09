@@ -12,14 +12,12 @@ import com.sun.net.httpserver.HttpExchange;
 
 /**
  * A utility class to standardize and ease access to header variables.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class RequestUtils {
 	
 	/**
 	 * Gets the IP address of a client if it traveled through a normal proxy or other system that provides the X-Forwarded-For header.
-	 * 
 	 * @param he The HTTP request.
 	 * @return The IP address of the request origin.
 	 */
@@ -32,7 +30,6 @@ public class RequestUtils {
 	
 	/**
 	 * Maps elements of a get query for easy processing.
-	 * 
 	 * @param qs A get query from url.
 	 * @return A HashMap of get parameters and their values.
 	 */
@@ -65,7 +62,6 @@ public class RequestUtils {
 	
 	/**
 	 * Maps elements of a get query for easy processing.
-	 * 
 	 * @param qs A get query from url.
 	 * @return A HashMap of get parameters and their values.
 	 */
@@ -84,7 +80,6 @@ public class RequestUtils {
 	
 	/**
 	 * Maps elements of a post query for easy processing.
-	 * 
 	 * @param he The HTTP request.
 	 * @return A HashMap of post parameters and their values.
 	 */

@@ -6,8 +6,7 @@ import net.aionstudios.jdc.JDC;
 
 /**
  * The bridge between server and website code, enabling {@link JDC} instances and their {@link Processor}s and {@link ElementProcessor}s to run.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class ContentProcessor {
 	
@@ -28,11 +27,16 @@ public class ContentProcessor {
 	 * within it to generate content by passing the Element that spawned it and other relevant data.
 	 */
 	/**
-	 * Adds a new ContentProcessor to the given website, initializing a {@link JDC} instance by reference to an archive to be loaded and the fully qualified name of a {@link JDC} class within said archive.
-	 * @param website
-	 * @param name
-	 * @param javaArchive
-	 * @param mainClass
+	 * Adds a new ContentProcessor to the given website, initializing a {@link JDC} instance by 
+	 * reference to an archive to be loaded and the fully qualified name of a {@link JDC} class
+	 * within said archive.
+	 * @param website The {@link Website} this ContentProcessor should be assigned to.
+	 * @param name The String naming this ContentProcessor.
+	 * @param javaArchive The JAR {@link File} that should be imported to be used by calls to this
+	 * Content Processor
+	 * @param mainClass The main class, an instance of {@link JDC}, which should be used to start
+	 * running and register {@link ProcessorSet}s and {@link ElementProcessor}s for this
+	 * ContentProcessor.
 	 * @see {@link JDCLoader}
 	 */
 	public ContentProcessor(Website website, String name, File javaArchive, String mainClass) {
@@ -59,10 +63,20 @@ public class ContentProcessor {
 		return javaArchive;
 	}
 	
+	/**
+	 * @return The String naming the main class, an instance of {@link JDC}, of this
+	 * Content Processor which should be used to start running and register 
+	 * {@link ProcessorSet}s and {@link ElementProcessor}s for this
+	 * ContentProcessor.
+	 */
 	public String getMainClass() {
 		return mainClass;
 	}
 	
+	/**
+	 * Reassigns the {@link JDC} to which this ContentProcessor should be tied.
+	 * @param jdc A {@link JDC} instance.
+	 */
 	public void setJDC(JDC jdc) {
 		this.jdc = jdc;
 	}

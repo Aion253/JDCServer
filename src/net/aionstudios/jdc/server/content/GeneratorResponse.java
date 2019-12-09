@@ -4,8 +4,7 @@ import net.aionstudios.jdc.content.ResponseCode;
 
 /**
  * Part of the response sent back to a user to complete an {@link HttpExchange}.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class GeneratorResponse {
 	

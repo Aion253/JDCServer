@@ -14,6 +14,11 @@ import javax.swing.event.ListSelectionEvent;
 
 import net.aionstudios.jdc.JDC;
 
+/**
+ * Loads dependencies from the "dependencies" folder next to JDC Server
+ * in order to support libraries required by {@link ContentProcessor}s.
+ * @author Winter Roberts
+ */
 public class DependencyLoader {
 	
 	private static URL[] dependencies;
@@ -42,10 +47,18 @@ public class DependencyLoader {
 		urlClassLoader = new URLClassLoader(dependencies, ClassLoader.getSystemClassLoader());
 	}
 	
+	/**
+	 * @return Returns the {@link URL}s pointing to JARs required by {@link ContentProcessor}s
+	 * of this application.
+	 */
 	public static URL[] getDependencies() {
 		return dependencies;
 	}
 	
+	/**
+	 * @return The {@link URLClassLoader} used by the dependency loader,
+	 * which is itself a child of the system class loader.
+	 */
 	public static URLClassLoader getUrlClassLoader() {
 		return urlClassLoader;
 	}

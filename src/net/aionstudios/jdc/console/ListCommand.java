@@ -8,6 +8,10 @@ import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 
+/**
+ * A {@link Command} that lists content processors or sites.
+ * @author Winter Roberts
+ */
 public class ListCommand extends Command {
 
 	public ListCommand() {

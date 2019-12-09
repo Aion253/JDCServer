@@ -31,8 +31,7 @@ import net.aionstudios.jdc.service.OutgoingRequestService;
 
 /**
  * Handles standard HTTP Contexts.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class ContextHandler implements HttpHandler {
 
@@ -40,12 +39,6 @@ public class ContextHandler implements HttpHandler {
 	public void handle(final HttpExchange he) {
 		long nanoStart = System.nanoTime();
 		/*TODO
-		 * extend information stored about websites in the website file
-		 * to include the url(s) at which a website should accept calls.
-		 * 
-		 * Direct server exchanges in this file in order to locate the
-		 * desired website and execute JDC as necessary.
-		 * 
 		 * Cron, Call, Live
 		 */
 		String[] requestSplit;
@@ -81,7 +74,7 @@ public class ContextHandler implements HttpHandler {
 			}
 		}
 		Website wb = WebsiteManager.getWebsiteByAddress(hostName);
-		//File Uploads
+		
 		List<MultipartFile> mfs = new ArrayList<MultipartFile>();
 		List<FileItem> deleteLater = new ArrayList<>();
 		final String cT = he.getRequestHeaders().containsKey("Content-Type") ? he.getRequestHeaders().getFirst("Content-Type") : "text/html";

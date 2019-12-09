@@ -12,8 +12,7 @@ import net.aionstudios.jdc.JDC;
 
 /**
  * Loads external archives into the JVM and creates new {@link JDC} instances for {@link Website}'s {@link ContentProcessor}s.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class JDCLoader {
 	
@@ -54,7 +53,9 @@ public class JDCLoader {
 	}
 	
 	/**
-	 * Instantiates a class, given its fully qualified name, after its archive's {@link URL} has been added into the JVM via a {@link URLClassLoader} and the method {@link JDCLoader#initializeClassLoader()}.
+	 * Instantiates a class, given its fully qualified name, after its archive's {@link URL} has been added into the JVM via a {@link URLClassLoader},
+	 * the child of the {@link DependencyLoader}s own. Which, following Java's dependency resolution model, ensures that the {@link JDC} and
+	 * {@link ContentProcessor}s this method creates have access to their dependencies.
 	 * <p>
 	 * We assume the type of the class to be {@link JDC} as expected and should an error occur, return nothing.
 	 * @param jdcClass		The fully qualified name of a {@link JDC} class within an external library.
@@ -77,9 +78,23 @@ public class JDCLoader {
 			System.err.println("Failed loading external JDC!");
 			e.printStackTrace();
 			return null;
+		} catch (ClassCastException e) {
+			System.err.println("Failed loading external JDC!");
+			e.printStackTrace();
+			return null;
 		}
 	}
 	
+	/**
+	 * Instantiates a class, given its fully qualified name, after its archive's {@link URL} has been added into the JVM via a {@link URLClassLoader},
+	 * the child of the {@link DependencyLoader}s own. Which, following Java's dependency resolution model, ensures that the {@link JDC} and
+	 * {@link ContentProcessor}s this method creates have access to their dependencies.
+	 * <p>
+	 * We assume the type of the class to be {@link JDC} as expected and should an error occur, return nothing.
+	 * @param jdcClass		The fully qualified name of a {@link JDC} class within an external library.
+	 * @return A {@link JDC} instance if one was found, legally accessed and properly cast and instantiated at
+	 * the given fully qualified name within one of the archives available to the JVM's class loader. Null otherwise.
+	 */
 	public static JDC getSingleJDC(File f, String jdcClass) {
 		try {
 			if(f.exists()) {
@@ -104,6 +119,10 @@ public class JDCLoader {
 			e.printStackTrace();
 			return null;
 		} catch (MalformedURLException e) {
+			System.err.println("Failed loading external JDC!");
+			e.printStackTrace();
+			return null;
+		} catch (ClassCastException e) {
 			System.err.println("Failed loading external JDC!");
 			e.printStackTrace();
 			return null;

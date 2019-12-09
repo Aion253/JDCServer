@@ -25,8 +25,7 @@ import net.aionstudios.jdc.server.util.FormatUtils;
 
 /**
  * A website retrieves content from a specific folder when requests are made to the server on addresses for which this website accepts.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class Website {
 	

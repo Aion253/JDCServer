@@ -4,8 +4,7 @@ import java.io.PrintStream;
 
 /**
  * Logs messages to the {@link Logger}'s {@link PrintStream}.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class LogStream extends PrintStream {
 
@@ -17,14 +16,12 @@ public class LogStream extends PrintStream {
 	}
 	
 	@Override
-    public final void print(String s)
-    {//do what ever you like
+    public final void print(String s) {
         LogOut.print(s);
     }
 	
 	@Override
-    public final void println(String s)
-    {//do what ever you like
+    public final void println(String s) {
         LogOut.println(s);
     }
 

@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Manages {@link Command} input and resolution, including
+ * help information and memory where available.
+ * @author Winter Roberts
+ */
 public class JDCConsole {
 	
 	private static JDCConsole self;
@@ -14,6 +19,10 @@ public class JDCConsole {
 	
 	private List<Command> commands;
 	
+	/**
+	 * A Singleton constructor that initializes the console input
+	 * and threadding for {@link Command} input.
+	 */
 	private JDCConsole() {
 		commands = new ArrayList<>();
 		running = false;
@@ -29,10 +38,13 @@ public class JDCConsole {
 					s = new Scanner(System.in);
 				}
 				while(running) {
+					String cPre = "";
 					String[] command;
-					if(useConsole) command = c.readLine("> ").split("\\s+");
-					else command = s.nextLine().split("\\s+");
+					if(useConsole) cPre = c.readLine("> ");
+					else cPre = s.nextLine();
+					command = cPre.split("\\s+");
 					boolean found = false;
+					System.out.println("Issued command: "+cPre);
 					if(command[0].equals("?")||command[0].equals("help")) {
 						String helpString = "Commands and usage:\r\n";
 						for(Command co : commands) {
@@ -61,6 +73,10 @@ public class JDCConsole {
 		consoleThread.setName("JDCConsole-Thread");
 	}
 	
+	/**
+	 * @return A singleton instance of {@link JDCConsole}, constructing it if
+	 * this is the first call to the method.
+	 */
 	public static JDCConsole getInstance() {
 		if(self==null) {
 			self = new JDCConsole();
@@ -68,6 +84,9 @@ public class JDCConsole {
 		return self;
 	}
 	
+	/**
+	 * Starts, or restarts, the application's command processing thread.
+	 */
 	public void startConsoleThread() {
 		if(!consoleThread.isAlive()) {
 			running = true;
@@ -75,14 +94,23 @@ public class JDCConsole {
 		}
 	}
 	
+	/**
+	 * Stops the application's command processing thread.
+	 */
 	public void stopConsoleThread() {
 		running = false;
 	}
 	
+	/**
+	 * @return True if the consoleThread has been initialized and is alive, false otherwise.
+	 */
 	public boolean isAlive() {
 		return consoleThread!=null&&consoleThread.isAlive();
 	}
 	
+	/**
+	 * @param c Registers a {@link Command}, failing for duplicate named entries.
+	 */
 	public void registerCommand(Command c) {
 		for(Command s : commands) {
 			if(c==s||c.getCommand().equals(s.getCommand())){

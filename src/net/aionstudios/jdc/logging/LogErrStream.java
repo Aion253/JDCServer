@@ -6,8 +6,7 @@ import org.fusesource.jansi.AnsiConsole;
 
 /**
  * Logs errors to the {@link Logger}'s {@link PrintStream}.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class LogErrStream extends PrintStream {
 
@@ -19,14 +18,12 @@ public class LogErrStream extends PrintStream {
 	}
 	
 	@Override
-    public final void print(String s)
-    {//do what ever you like
+    public final void print(String s) {
         LogOut.errp(s);
     }
 	
 	@Override
-    public final void println(String s)
-    {//do what ever you like
+    public final void println(String s) {
         LogOut.errpl(s);
     }
 

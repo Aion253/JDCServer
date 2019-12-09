@@ -25,11 +25,15 @@ import net.aionstudios.jdc.server.compression.GZIPCompressor;
 import net.aionstudios.jdc.server.content.GeneratorResponse;
 import net.aionstudios.jdc.server.content.Website;
 
+/**
+ * A utility class which handles HTTP errors, and file and JDC compression
+ * and transport, 
+ * @author Winter Roberts
+ */
 public class ResponseUtils {
 	
 	/**
 	 * Generates a response to the client.
-	 * 
 	 * @param he The HTTPExchange on which to respond.
 	 * @param httpResponseCode The HTTP response code.
 	 * @param response The response (likely a serialized {@link JSONObject}).
@@ -119,7 +123,6 @@ public class ResponseUtils {
 	
 	/**
 	 * Responds with a file over HTTP.
-	 * 
 	 * @param rc		The HTTP {@link ResponseCode}.
 	 * @param he		The {@link HttpExchange} handling this request.
 	 * @param vars		The {@link RequestVariables} containing information about the request and response.

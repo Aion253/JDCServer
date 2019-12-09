@@ -10,8 +10,7 @@ import org.fusesource.jansi.AnsiConsole;
 
 /**
  * Manages the application's log file.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class Logger {
 	

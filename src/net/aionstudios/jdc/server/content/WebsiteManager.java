@@ -5,8 +5,7 @@ import java.util.List;
 
 /**
  * Manages all {@link Website}s exposed by the server.
- * @author Winter
- *
+ * @author Winter Roberts
  */
 public class WebsiteManager {
 	

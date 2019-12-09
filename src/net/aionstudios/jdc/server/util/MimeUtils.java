@@ -3,11 +3,18 @@ package net.aionstudios.jdc.server.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A utility class for working with file mime types.
+ * @author Winter Roberts
+ */
 public class MimeUtils {
 	
 	private Map<String, String> mimeExtensionMap = new HashMap<String, String>();
 	private static MimeUtils self;
 	
+	/**
+	 * A singleton constructor which registers system-defined mime types.
+	 */
 	private MimeUtils() {
 		mimeExtensionMap.putIfAbsent("html", "text/html");
 		mimeExtensionMap.putIfAbsent("htm", "text/html");
@@ -138,6 +145,9 @@ public class MimeUtils {
 		mimeExtensionMap.putIfAbsent("m4v", "video/m4a");
 	}
 	
+	/**
+	 * @return A singleton instance of {@link MimeUtils}.
+	 */
 	public static MimeUtils getInstance() {
 		if(self==null) {
 			self = new MimeUtils();
@@ -145,10 +155,20 @@ public class MimeUtils {
 		return self;
 	}
 	
+	/**
+	 * Adds a mime type if it's not already been defined by the application.
+	 * @param extension The unique file type for which this mime type should be assigned.
+	 * @param mimeString The mime type String which which the extension will be assigned.
+	 */
 	public void addMimeType(String extension, String mimeString) {
 		mimeExtensionMap.putIfAbsent(extension, mimeString);
 	}
 	
+	/**
+	 * @param extension The extension for a file.
+	 * @return The mime type string if this extension is registered
+	 * or application/octet-stream otherwise.
+	 */
 	public String getMimeString(String extension) {
 		return mimeExtensionMap.getOrDefault(extension, "application/octet-stream");
 	}
