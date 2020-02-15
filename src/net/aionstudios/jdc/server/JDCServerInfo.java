@@ -100,7 +100,7 @@ public class JDCServerInfo {
 			if(!scf.exists()) {
 				scf.getParentFile().mkdirs();
 				scf.createNewFile();
-				JSONObject fo = new JSONObject();
+				JSONObject fo = FormatUtils.getLinkedJsonObject();
 				fo.put("brotli", true);
 				serverConfig.put("enable_features", fo);
 				serverConfig.put("http_port", 80);

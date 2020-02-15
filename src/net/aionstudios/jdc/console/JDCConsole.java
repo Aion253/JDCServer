@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Manages {@link Command} input and resolution, including
@@ -17,14 +19,14 @@ public class JDCConsole {
 	private static Thread consoleThread;
 	private static boolean running;
 	
-	private List<Command> commands;
+	private Set<Command> commands;
 	
 	/**
 	 * A Singleton constructor that initializes the console input
 	 * and threadding for {@link Command} input.
 	 */
 	private JDCConsole() {
-		commands = new ArrayList<>();
+		commands = new TreeSet<>();
 		running = false;
 		consoleThread = new Thread(new Runnable() {
 

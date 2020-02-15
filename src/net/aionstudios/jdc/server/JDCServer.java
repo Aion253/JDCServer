@@ -1,29 +1,25 @@
 package net.aionstudios.jdc.server;
 
-import net.aionstudios.jdc.console.JDCConsole;
-import net.aionstudios.jdc.console.ListCommand;
-import net.aionstudios.jdc.console.ReloadCommand;
-import net.aionstudios.jdc.content.ResponseCode;
-import net.aionstudios.jdc.context.ContextHandler;
-import net.aionstudios.jdc.logging.LogOut;
-import net.aionstudios.jdc.logging.Logger;
-import net.aionstudios.jdc.logging.StandardOverride;
-import net.aionstudios.jdc.server.content.PageParser;
-import net.aionstudios.jdc.server.content.Website;
-import net.aionstudios.jdc.server.content.WebsiteManager;
-import net.aionstudios.jdc.server.util.FormatUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.nixxcode.jvmbrotli.common.BrotliLoader;
 import com.sun.net.httpserver.HttpServer;
+
+import net.aionstudios.jdc.console.JDCConsole;
+import net.aionstudios.jdc.console.ListCommand;
+import net.aionstudios.jdc.console.ReloadCommand;
+import net.aionstudios.jdc.console.StopCommand;
+import net.aionstudios.jdc.context.ContextHandler;
+import net.aionstudios.jdc.logging.LogOut;
+import net.aionstudios.jdc.logging.Logger;
+import net.aionstudios.jdc.logging.StandardOverride;
+import net.aionstudios.jdc.server.util.FormatUtils;
 
 /**
  * Handles requests to the insecure web port for this server.
@@ -71,6 +67,7 @@ public class JDCServer {
 		System.out.println("Server started on port " + JDCServerInfo.getHttpPort());
 		new ReloadCommand();
 		new ListCommand();
+		new StopCommand();
 		JDCConsole.getInstance().startConsoleThread();
 		startSecureServer();
 		if(JDCServerInfo.isEnableBrotli()) BrotliLoader.isBrotliAvailable();

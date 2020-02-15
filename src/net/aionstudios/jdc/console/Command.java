@@ -4,7 +4,7 @@ package net.aionstudios.jdc.console;
  * Defines the functionality for a console command in JDC Server.
  * @author Winter Roberts
  */
-public abstract class Command {
+public abstract class Command implements Comparable<Command> {
 	
 	private String command;
 	
@@ -35,5 +35,10 @@ public abstract class Command {
 	 * @return Prints the help information, i.e. USAGE of this command.
 	 */
 	public abstract String getHelp();
+	
+	@Override
+	public int compareTo(Command other) {
+		return command.compareTo(other.command);
+	}
 	
 }
