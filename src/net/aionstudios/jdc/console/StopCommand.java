@@ -1,5 +1,7 @@
 package net.aionstudios.jdc.console;
 
+import java.util.Map.Entry;
+
 import net.aionstudios.jdc.server.content.ContentProcessor;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
@@ -16,9 +18,9 @@ public class StopCommand extends Command {
 			System.out.println(getHelp());
 		} else if(args.length==0) {
 			System.out.println("Shutting down server...");
-			for(Website w : WebsiteManager.websites) {
-				for(ContentProcessor cp : w.getProcessors()) {
-					cp.getJDC().onShutdown();
+			for(Entry<String, Website> w : WebsiteManager.websites.entrySet()) {
+				for(Entry<String, ContentProcessor> cp : w.getValue().getProcessors().entrySet()) {
+					cp.getValue().getJDC().onShutdown();
 				}
 			}
 			System.exit(0);

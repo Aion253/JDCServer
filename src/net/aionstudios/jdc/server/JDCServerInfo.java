@@ -39,7 +39,7 @@ import net.aionstudios.jdc.util.DatabaseUtils;
  */
 public class JDCServerInfo {
 
-	public static final String JDCS_VER = "1.0.1";
+	public static final String JDCS_VER = "1.0.2";
 	public static final String JDCS_CONFIG = "./sites.json";
 	public static final String CONFIG_DB = "./database.json";
 	public static final String CONFIG_SERVER = "./config.json";

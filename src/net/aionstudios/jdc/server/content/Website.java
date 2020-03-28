@@ -32,8 +32,8 @@ public class Website {
 	private String name;
 	private String[] addresses;
 	private boolean sslOn;
-	private List<ContentProcessor> processors = new ArrayList<ContentProcessor>();
-	private Map<ResponseCode, File> errorMappings = new HashMap<ResponseCode, File>();
+	private Map<String, ContentProcessor> processors = new HashMap<>();
+	private Map<ResponseCode, File> errorMappings = new HashMap<>();
 	private ProxyManager pm = new ProxyManager();
 	
 	private File websiteFolder;
@@ -260,14 +260,7 @@ public class Website {
 	 * @see {@link JDCLoader}
 	 */
 	public void addContentProcessor(ContentProcessor processor) {
-		for(ContentProcessor cp : processors) {
-			if(cp.getName().equals(processor.getName())) {
-				processors.remove(cp);
-				processors.add(processor);
-				return;
-			}
-		}
-		processors.add(processor);
+		processors.put(processor.getName(), processor);
 	}
 	
 	/**
@@ -283,16 +276,12 @@ public class Website {
 			ConsoleErrorUtils.printServerError(rc, path, Thread.currentThread().getStackTrace());
 			return null;
 		}
-		for(ContentProcessor cp : processors) {
-			if(cp.getName().equals(points[0])) {
-				for(ProcessorSet ps : cp.getJDC().getProcessorManager().getProcessorSets()) {
-					if(ps.getName().equals(points[1])) {
-						for(ElementProcessor ep : ps.getElementProcessors()) {
-							if(ep.getName().equals(points[2])) {
-								return ep;
-							}
-						}
-					}
+		if(processors.containsKey(points[0])) {
+			ContentProcessor cp = processors.get(points[0]);
+			if(cp.getJDC().getProcessorManager().getProcessorSets().containsKey(points[1])) {
+				ProcessorSet ps = cp.getJDC().getProcessorManager().getProcessorSets().get(points[1]);
+				if(ps.getElementProcessors().containsKey(points[2])) {
+					return ps.getElementProcessors().get(points[2]);
 				}
 			}
 		}
@@ -314,16 +303,12 @@ public class Website {
 			ConsoleErrorUtils.printServerError(rc, path, Thread.currentThread().getStackTrace());
 			return null;
 		}
-		for(ContentProcessor cp : processors) {
-			if(cp.getName().equals(points[0])) {
-				for(ProcessorSet ps : cp.getJDC().getProcessorManager().getProcessorSets()) {
-					if(ps.getName().equals(points[1])) {
-						for(Processor ep : ps.getProcessors()) {
-							if(ep.getName().equals(points[2])) {
-								return ep;
-							}
-						}
-					}
+		if(processors.containsKey(points[0])) {
+			ContentProcessor cp = processors.get(points[0]);
+			if(cp.getJDC().getProcessorManager().getProcessorSets().containsKey(points[1])) {
+				ProcessorSet ps = cp.getJDC().getProcessorManager().getProcessorSets().get(points[1]);
+				if(ps.getProcessors().containsKey(points[2])) {
+					return ps.getProcessors().get(points[2]);
 				}
 			}
 		}
@@ -384,7 +369,7 @@ public class Website {
 	/**
 	 * @return A list of all {@link ContentProcessor}s registered to this website.
 	 */
-	public List<ContentProcessor> getProcessors(){
+	public Map<String, ContentProcessor> getProcessors(){
 		return processors;
 	}
 

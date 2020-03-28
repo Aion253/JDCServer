@@ -1,7 +1,8 @@
 package net.aionstudios.jdc.server.content;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Manages all {@link Website}s exposed by the server.
@@ -9,21 +10,14 @@ import java.util.List;
  */
 public class WebsiteManager {
 	
-	public static List<Website> websites = new ArrayList<Website>();
+	public static Map<String, Website> websites = new HashMap<>();
 	
 	/**
 	 * Adds a {@link Website} to the list available from the server.
 	 * @param ws	The {@link Website} to be added.
 	 */
 	public static void addWebsite(Website ws) {
-		for(Website w : websites) {
-			if(w.getName() == ws.getName()) {
-				websites.remove(w);
-				websites.add(ws);
-				return;
-			}
-		}
-		websites.add(ws);
+		websites.put(ws.getName(), ws);
 	}
 	
 	/**
@@ -32,12 +26,7 @@ public class WebsiteManager {
 	 * @return The named {@link Website}, or null if one isn't found.
 	 */
 	public static Website getWebsite(String name) {
-		for(Website w : websites) {
-			if(w.getName().equals(name)) {
-				return w;
-			}
-		}
-		return null;
+		return websites.get(name);
 	}
 	
 	/**
@@ -46,10 +35,10 @@ public class WebsiteManager {
 	 * @return The {@link Website} accpeting the address, or null if one isn't found.
 	 */
 	public static Website getWebsiteByAddress(String addr) {
-		for(Website w : websites) {
-			for(String a : w.getAddresses()) {
+		for(Entry<String, Website> w : websites.entrySet()) {
+			for(String a : w.getValue().getAddresses()) {
 				if(a.equals(addr)) {
-					return w;
+					return w.getValue();
 				}
 			}
 		}
@@ -61,16 +50,9 @@ public class WebsiteManager {
 	 * @see {@link JDCLoader}
 	 */
 	public static void connectContentProcessors() {
-		for(Website w : websites) {
-			for(ContentProcessor cp : w.getProcessors()) {
-				cp.connectContentProcessor();
-				//TODO register JDC instances so they can be called by java-execute in pages.
-				/*
-				 * Additional note because I know I'll check here later.
-				 * 
-				 * See about implementing an on-demand page (part-of-page) generating service
-				 * to avoid running big queries with results that don't change often.
-				 */
+		for(Entry<String, Website> w : websites.entrySet()) {
+			for(Entry<String, ContentProcessor> cp : w.getValue().getProcessors().entrySet()) {
+				cp.getValue().connectContentProcessor();
 			}
 		}
 	}

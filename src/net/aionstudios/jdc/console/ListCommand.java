@@ -1,10 +1,8 @@
 package net.aionstudios.jdc.console;
 
-import java.util.List;
+import java.util.Map.Entry;
 
-import net.aionstudios.jdc.JDC;
 import net.aionstudios.jdc.server.content.ContentProcessor;
-import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 
@@ -24,16 +22,16 @@ public class ListCommand extends Command {
 			System.out.println(getHelp());
 		} else if(args.length>=1&&args[0].equals("sites")) {
 			String s = "Sites:";
-			for(Website w : WebsiteManager.websites) {
-				s = s.concat("\r\n    "+w.getName());
+			for(Entry<String, Website> w : WebsiteManager.websites.entrySet()) {
+				s = s.concat("\r\n    "+w.getValue().getName());
 			}
 			System.out.println(s);
 		} else if(args.length>=2&&args[0].equals("processors")) {
 			Website w = WebsiteManager.getWebsite(args[1]);
 			if(w!=null) {
 				String s = "Processors:";
-				for(ContentProcessor cp : w.getProcessors()) {
-					s = s.concat("\r\n    "+cp.getName());
+				for(Entry<String, ContentProcessor> cp : w.getProcessors().entrySet()) {
+					s = s.concat("\r\n    "+cp.getValue().getName());
 				}
 				System.out.println(s);
 			} else {
