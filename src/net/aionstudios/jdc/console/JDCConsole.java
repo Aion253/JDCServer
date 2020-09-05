@@ -26,6 +26,7 @@ public class JDCConsole {
 	 * and threadding for {@link Command} input.
 	 */
 	private JDCConsole() {
+		self = this;
 		commands = new TreeSet<>();
 		running = false;
 		consoleThread = new Thread(new Runnable() {
@@ -80,10 +81,7 @@ public class JDCConsole {
 	 * this is the first call to the method.
 	 */
 	public static JDCConsole getInstance() {
-		if(self==null) {
-			self = new JDCConsole();
-		}
-		return self;
+		return self != null ? self : new JDCConsole();
 	}
 	
 	/**

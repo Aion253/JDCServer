@@ -16,6 +16,7 @@ public class MimeUtils {
 	 * A singleton constructor which registers system-defined mime types.
 	 */
 	private MimeUtils() {
+		self = this;
 		mimeExtensionMap.putIfAbsent("html", "text/html");
 		mimeExtensionMap.putIfAbsent("htm", "text/html");
 		mimeExtensionMap.putIfAbsent("htmls", "text/html");
@@ -149,10 +150,7 @@ public class MimeUtils {
 	 * @return A singleton instance of {@link MimeUtils}.
 	 */
 	public static MimeUtils getInstance() {
-		if(self==null) {
-			self = new MimeUtils();
-		}
-		return self;
+		return self != null ? self : new MimeUtils();
 	}
 	
 	/**
