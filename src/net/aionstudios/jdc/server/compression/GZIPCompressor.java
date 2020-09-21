@@ -1,15 +1,15 @@
 package net.aionstudios.jdc.server.compression;
 
-/**
- * A {@link CompressionEncoding} that compresses using GZIP.
- * @author Winter Roberts
- */
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * A {@link CompressionEncoding} that compresses using GZIP.
+ * @author Winter Roberts
+ */
 public class GZIPCompressor {
 	
 	/**

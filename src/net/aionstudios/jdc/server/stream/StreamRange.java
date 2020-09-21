@@ -3,6 +3,12 @@ package net.aionstudios.jdc.server.stream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An API for HTTP byte-range streaming computation.
+ * 
+ * @author Winter Roberts
+ *
+ */
 public class StreamRange {
 
 	private String rangeUnit;
@@ -10,6 +16,12 @@ public class StreamRange {
 	private List<Long[]> ranges;
 	private long length;
 	
+	/**
+	 * Creates a StreamRange object.
+	 * 
+	 * @param streamRange	The HTTP header range string.
+	 * @param len			The length of the file to be range streamed.
+	 */
 	public StreamRange(String streamRange, long len) {
 		length=len;
 		ranges = new ArrayList<>();
@@ -30,14 +42,23 @@ public class StreamRange {
 		}
 	}
 	
+	/**
+	 * @return The range unit specified by the request. Bytes is the only supported option by the server and should be included for all requests.
+	 */
 	public String getRangeUnit() {
 		return rangeUnit;
 	}
 	
+	/**
+	 * @return A list of each start and end of byte ranges.
+	 */
 	public List<Long[]> getRanges() {
 		return ranges;
 	}
 	
+	/**
+	 * @return Builds a string for the Content-Range response header.
+	 */
 	public String generateContentRangeString() {
 		String e = getRangeUnit() + " ";
 		int next = 0;
@@ -57,6 +78,10 @@ public class StreamRange {
 		return e+"/"+length;
 	}
 	
+	/**
+	 * Validates that the ranges don't read backward, overflow, or overlap in the request ranges.
+	 * @return True if the ranges are valid, false otherwise.
+	 */
 	public boolean validateRanges() {
 		for (int i = 0; i < ranges.size(); i++) {
 			for (int j = 0; j < ranges.size(); j++) {
@@ -72,6 +97,13 @@ public class StreamRange {
 		return true;
 	}
 	
+	/**
+	 * Changes relative range parts to real byte definitions.
+	 * 
+	 * @param range		The range to be defined.
+	 * @param len		The length of the file.
+	 * @return The recomputed byte range definition.
+	 */
 	private Long[] computeActualRange(Long[] range, long len) {
 		Long[] newRange = new Long[2];
 		if (range[1]==null) {
@@ -87,6 +119,9 @@ public class StreamRange {
 		return newRange;
 	}
 	
+	/**
+	 * @return The length of the file to be range-seaked.
+	 */
 	public long getLength() {
 		return length;
 	}

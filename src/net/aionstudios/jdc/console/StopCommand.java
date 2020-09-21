@@ -6,6 +6,10 @@ import net.aionstudios.jdc.server.content.ContentProcessor;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 
+/**
+ * A {@link Command} that safely shuts down the server.
+ * @author Winter Roberts
+ */
 public class StopCommand extends Command {
 
 	public StopCommand() {

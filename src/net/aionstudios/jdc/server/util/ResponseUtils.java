@@ -173,6 +173,13 @@ public class ResponseUtils {
 	        		ignoreSR = (s[0]!=null&&s[0]==0&&s[1]==null);
 	        	}
 
+	        	if (sr == null || ignoreSR) {
+	        		he.sendResponseHeaders(200, 0); 
+	    		} else {
+	    			he.getResponseHeaders().set("Content-Range", sr.generateContentRangeString());
+					he.sendResponseHeaders(206, 0); 
+	    		}
+	        	
 	        	if(ce==CompressionEncoding.BR) {
 	        		final byte[] buffer = new byte[1024];
 	        		BrotliOutputStream os = new BrotliOutputStream(he.getResponseBody());
@@ -203,10 +210,18 @@ public class ResponseUtils {
 		return true;
 	}
 	
+	/**
+	 * Writes a file input stream to the connection as a response.
+	 * 
+	 * @param he		The HTTP-Exchange handling this connection.
+	 * @param buffer	The byte buffer which should be used to write.
+	 * @param os		The output stream which can be used to write to the upstream client.
+	 * @param file		The file to be streamed to the client.
+	 * @throws FileNotFoundException If the file does not exist.
+	 */
 	public static void outputFile(HttpExchange he, byte[] buffer, OutputStream os, File file) throws FileNotFoundException {
 		FileInputStream fs = new FileInputStream(file);
 		try {
-			he.sendResponseHeaders(200, 0); 
 			int count;
 	        while ((count = fs.read(buffer)) > 0) {
 	          os.write(buffer,0,count);
@@ -221,6 +236,17 @@ public class ResponseUtils {
 		}
 	}
 	
+	/**
+	 * Writes a file input stream to the connection as a range response
+	 * 
+	 * @param he		The HTTP-Exchange handling this connection.
+	 * @param buffer	The byte buffer which should be used to write.
+	 * @param os		The output stream which can be used to write to the upstream client.
+	 * @param file		The file to be streamed to the client.
+	 * @param sr		The {@link StreamRange}, which can be null, that defines what bytes should be read
+	 * @param ignoreSR	Allows a non-null {@link StreamRange} to be ignored.
+	 * @throws FileNotFoundException If the file does not exist.
+	 */
 	public static void streamFile(HttpExchange he, byte[] buffer, OutputStream os, File file, StreamRange sr, boolean ignoreSR) throws FileNotFoundException {
 		if (sr == null || ignoreSR) {
 			outputFile(he, buffer, os, file);
@@ -228,9 +254,7 @@ public class ResponseUtils {
 		}
 		RandomAccessFile rf = new RandomAccessFile(file,"r");
 		try {
-			int count = 0;
-			he.getResponseHeaders().set("Content-Range", sr.generateContentRangeString());
-			he.sendResponseHeaders(206, 0);  
+			int count = 0; 
 			long len = sr.getLength();
 			for(Long[] r : sr.getRanges()) {
 				long rangeBase = r[0]==null?(len-r[1]):r[0];
@@ -260,6 +284,10 @@ public class ResponseUtils {
 		}
 	}
 	
+	/**
+	 * Closes the given stream safely to prevent errors in data integrity and thread crashes.
+	 * @param os	The output stream to be closed.
+	 */
 	public static void safeCloseStream(OutputStream os) {
 		try {
 			os.flush();
