@@ -1,7 +1,9 @@
 package net.aionstudios.jdc.server.proxy;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Maps request {@link URL}s to outgoing requests per {@link Website}.
@@ -34,6 +36,13 @@ public class ProxyManager {
 	 */
 	public void removeProxy(String context) {
 		p.remove(context);
+	}
+	
+	public void printProxies() {
+		for(Iterator<Entry<String, String>> i = p.entrySet().iterator(); i.hasNext(); ) {
+			Entry<String, String> e = i.next();
+			System.out.println(e.getKey() + "\t" + e.getValue());
+		}
 	}
 	
 	/**

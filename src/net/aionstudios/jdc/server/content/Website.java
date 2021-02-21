@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,9 +34,9 @@ public class Website {
 	private String name;
 	private String[] addresses;
 	private boolean sslOn;
-	private Map<String, ContentProcessor> processors = new HashMap<>();
-	private Map<ResponseCode, File> errorMappings = new HashMap<>();
-	private ProxyManager pm = new ProxyManager();
+	private Map<String, ContentProcessor> processors;
+	private Map<ResponseCode, File> errorMappings;
+	private ProxyManager pm;
 	
 	private File websiteFolder;
 	
@@ -85,17 +87,18 @@ public class Website {
 	 * @see {@link JDCLoader}
 	 */
 	public void readProcessorsConfig() {
+		processors = new HashMap<>();
 		if(processorConfig.exists()) {
 			processorJson = JDCServerInfo.readConfig(processorConfig);
 		} else {
 			try {
 				processorConfig.createNewFile();
 				JSONArray pa = new JSONArray();
-				JSONObject pad = FormatUtils.getLinkedJsonObject();
-				pad.put("name", "default");
-				pad.put("jar", "default.jar");
-				pad.put("jdc_class", "com.default.MainJDC");
-				pa.put(pad);
+//				JSONObject pad = FormatUtils.getLinkedJsonObject();
+//				pad.put("name", "default");
+//				pad.put("jar", "default.jar");
+//				pad.put("jdc_class", "com.default.MainJDC");
+//				pa.put(pad);
 				processorJson.put("processors", pa);
 				JDCServerInfo.writeConfig(processorJson, processorConfig);
 			} catch (IOException e) {
@@ -130,6 +133,7 @@ public class Website {
 	 * @see {@link #makeErrorMapping(ResponseCode, File)}
 	 */
 	public void readErrorsConfig() {
+		errorMappings = new HashMap<>();
 		if(errorsConfig.exists()) {
 			errorJson = JDCServerInfo.readConfig(errorsConfig);
 		} else {
@@ -182,7 +186,7 @@ public class Website {
 					System.err.println("Error response code '"+error.getInt("error_code")+"' doesn't exist.");
 				}
 			} catch (JSONException e) {
-				System.err.println("Failed to interpret processor config!");
+				System.err.println("Failed to interpret error config!");
 				e.printStackTrace();
 			}
 		}
@@ -193,6 +197,7 @@ public class Website {
 	 * @see {@link ProxyManager}
 	 */
 	public void readProxiesConfig() {
+		pm = new ProxyManager();
 		if(proxiesConfig.exists()) {
 			proxyJson = JDCServerInfo.readConfig(proxiesConfig);
 		} else {
@@ -245,11 +250,37 @@ public class Website {
 		return addresses;
 	}
 	
+	public void addAddress(String s) {
+		String[] addrNew = new String[addresses.length+1];
+		for (int i = 0; i < addresses.length; i++) {
+			if (s.equals(addresses[i])) return;
+			addrNew[i]=addresses[i];
+		}
+		addrNew[addrNew.length-1] = s;
+		addresses = addrNew;
+	}
+	
+	public void removeAddress(String s) {
+		String[] addrNew = new String[addresses.length-1];
+		boolean found = false;
+		for (int i = 0; i < addresses.length; i++) {
+			if (s.equals(addresses[i])) {
+				found = true;
+			} else {
+				addrNew[(i-(found?1:0))] = addresses[i];
+			}
+		}
+		addresses = found?addrNew:addresses;
+	}
 	/**
 	 * @return True if this website is configured to allow access through the {@link JDCSecureServer}.
 	 */
 	public boolean isSslOn() {
 		return sslOn;
+	}
+	
+	public void sslOn(boolean setting) {
+		sslOn = setting;
 	}
 	
 	/**
@@ -355,6 +386,20 @@ public class Website {
 	 */
 	public void makeErrorMapping(ResponseCode code, File relativePath) {
 		errorMappings.put(code, relativePath);
+	}
+	
+	public void printErrorMapping() {
+		for (Iterator<Entry<ResponseCode, File>> i = errorMappings.entrySet().iterator(); i.hasNext(); ) {
+			Entry<ResponseCode, File> errorI = i.next();
+			System.out.println(String.format("%-4d %s", errorI.getKey().getCode(), errorI.getValue().getPath()));
+		}
+	}
+	
+	public void printProcessors() {
+		for (Iterator<Entry<String, ContentProcessor>> i = processors.entrySet().iterator(); i.hasNext(); ) {
+			Entry<String, ContentProcessor> pI = i.next();
+			System.out.println(String.format("%-16s %s", FormatUtils.cap(pI.getKey(), 16, true), pI.getValue().getMainClass()));
+		}
 	}
 	
 	/***

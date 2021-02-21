@@ -2,36 +2,26 @@ package net.aionstudios.jdc.server;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.aionstudios.jdc.database.DatabaseConnector;
-import net.aionstudios.jdc.database.QueryResults;
+import net.aionstudios.jdc.server.compression.BrotliCompressor;
+import net.aionstudios.jdc.server.compression.CompressionEncoding;
 import net.aionstudios.jdc.server.content.DependencyLoader;
 import net.aionstudios.jdc.server.content.JDCLoader;
 import net.aionstudios.jdc.server.content.Website;
 import net.aionstudios.jdc.server.content.WebsiteManager;
 import net.aionstudios.jdc.server.util.FormatUtils;
-import net.aionstudios.jdc.util.DatabaseUtils;
+import net.aionstudios.jdc.server.util.LinkedJSONObject;
 
 /**
  * Handles configuration files and application setting accessibility.
@@ -66,15 +56,7 @@ public class JDCServerInfo {
 			if(!dbcf.exists()) {
 				dbcf.getParentFile().mkdirs();
 				dbcf.createNewFile();
-				System.err.println("No config, using default settings!");
 				JSONArray ws = new JSONArray();
-				JSONObject defWeb = FormatUtils.getLinkedJsonObject();
-				defWeb.put("name", "default");
-				JSONArray defWebAddrs = new JSONArray();
-				defWebAddrs.put("localhost");
-				defWeb.put("addresses", defWebAddrs);
-				defWeb.put("ssl_enabled", false);
-				ws.put(defWeb);
 				webconfig.put("websites", ws);
 				writeConfig(webconfig, dbcf);
 			} else {
@@ -195,7 +177,7 @@ public class JDCServerInfo {
 	 * @param f	The {@link File} object, representing a file containing JSON data on the file system.
 	 * @return	A {@link JSONObject} representing the file provided or null if it could not be read.
 	 */
-	public static JSONObject readConfig(File f) {
+	public static JSONObject readConfig(File f, boolean linked) {
 		if(!f.exists()) {
 			System.err.println("Failed reading config: '"+f.toString()+"'. No such file!");
 			return null;
@@ -206,7 +188,7 @@ public class JDCServerInfo {
 		    	jsonString += line;
 		    }
 		    br.close();
-		    return new JSONObject(jsonString);
+		    return linked?new LinkedJSONObject(jsonString):new JSONObject(jsonString);
 		} catch (IOException e) {
 			System.err.println("Encountered an IOException while reading config: '"+f.toString()+"'!");
 			e.printStackTrace();
@@ -216,6 +198,10 @@ public class JDCServerInfo {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static JSONObject readConfig(File f) {
+		return readConfig(f, false);
 	}
 	
 	/**

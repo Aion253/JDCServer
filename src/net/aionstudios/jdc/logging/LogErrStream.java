@@ -27,4 +27,15 @@ public class LogErrStream extends PrintStream {
         LogOut.errpl(s);
     }
 
+	@Override
+	public final PrintStream printf(String format, Object... args) {
+		LogOut.errp(String.format(format, args));
+		return this;
+	}
+	
+	@Override
+	public final PrintStream format(String format, Object... args) {
+		return printf(format, args);
+	}
+	
 }

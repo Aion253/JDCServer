@@ -14,6 +14,7 @@ import com.sun.net.httpserver.HttpServer;
 import net.aionstudios.jdc.console.JDCConsole;
 import net.aionstudios.jdc.console.ListCommand;
 import net.aionstudios.jdc.console.ReloadCommand;
+import net.aionstudios.jdc.console.SiteCommand;
 import net.aionstudios.jdc.console.StopCommand;
 import net.aionstudios.jdc.context.ContextHandler;
 import net.aionstudios.jdc.logging.LogOut;
@@ -68,6 +69,7 @@ public class JDCServer {
 		new ReloadCommand();
 		new ListCommand();
 		new StopCommand();
+		new SiteCommand();
 		JDCConsole.getInstance().startConsoleThread();
 		startSecureServer();
 		if(JDCServerInfo.isEnableBrotli()) BrotliLoader.isBrotliAvailable();

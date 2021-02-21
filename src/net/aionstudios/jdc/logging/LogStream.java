@@ -24,5 +24,16 @@ public class LogStream extends PrintStream {
     public final void println(String s) {
         LogOut.println(s);
     }
+	
+	@Override
+	public final PrintStream printf(String format, Object... args) {
+		LogOut.print(String.format(format, args));
+		return this;
+	}
+	
+	@Override
+	public final PrintStream format(String format, Object... args) {
+		return printf(format, args);
+	}
 
 }

@@ -40,27 +40,7 @@ public class FormatUtils {
 	 * @return An empty {@link JSONObject} with modified structure.
 	 */
 	public static JSONObject getLinkedJsonObject() {
-		JSONObject j = new JSONObject();
-		Field map;
-		try {
-			map = j.getClass().getDeclaredField("map");
-			map.setAccessible(true);
-			map.set(j, new LinkedHashMap<>());
-			map.setAccessible(false);
-		} catch (NoSuchFieldException e) {
-			System.err.println("JSONObject re-link failed!");
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			System.err.println("JSONObject re-link failed!");
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			System.err.println("JSONObject re-link failed!");
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			System.err.println("JSONObject re-link failed!");
-			e.printStackTrace();
-		}
-		return j;
+		return new LinkedJSONObject();
 	}
 	
 	private static SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
@@ -86,6 +66,13 @@ public class FormatUtils {
 	public static String getLastModifiedAsHTTPString(Date d) {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return sdf.format(d);
+	}
+	
+	public static String cap(String s, int maxLength, boolean ellipse) {
+		if (s.length() > maxLength) {
+			return ellipse?s.substring(0, maxLength-3)+"...":s.substring(0, maxLength);
+		}
+		return s;
 	}
 
 }

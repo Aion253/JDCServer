@@ -82,7 +82,10 @@ public class ReloadCommand extends Command {
 	@Override
 	public String getHelp() {
 		return "Reloads content processors for the application, website, or single processor.\r\n"
-				+ "    USAGE: reload [all | site <website> | processor <website> <processor>]";
+				+ "    USAGE:\r\n"
+				+ "      reload all\r\n"
+				+ "      reload site <website>\r\n"
+				+ "      reload processor <website> <processor>";
 	}
 
 }

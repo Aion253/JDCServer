@@ -37,7 +37,8 @@ public class StopCommand extends Command {
 	@Override
 	public String getHelp() {
 		return "Stops JDC Server.\r\n"
-				+ "    USAGE: stop";
+				+ "    USAGE:\r\n"
+				+ "      stop";
 	}
 	
 }

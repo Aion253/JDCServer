@@ -46,7 +46,9 @@ public class ListCommand extends Command {
 	@Override
 	public String getHelp() {
 		return "List content processors or sites.\r\n"
-				+ "    USAGE: list [sites | processors <website>]";
+				+ "    USAGE:\r\n"
+				+ "      list sites\r\n"
+				+ "      list processors <website>";
 	}
 	
 }
